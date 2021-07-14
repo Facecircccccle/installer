@@ -1,9 +1,5 @@
 package setup
 
-import (
-	"encoding/json"
-)
-
 type Setup struct {
 	MasterCount int
 	NodeCount   int
@@ -247,7 +243,7 @@ func NewSampleSetupStructure() *Setup {
 	}
 }
 
-func StructureToJSON(s Setup) string {
-	jsonByte, _ := json.Marshal(s)
-	return string(jsonByte)
-}
+//func StructureToJSON(s Setup) string {
+//	jsonByte, _ := json.Marshal(s)
+//	return string(jsonByte)
+//}
