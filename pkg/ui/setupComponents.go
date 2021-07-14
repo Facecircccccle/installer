@@ -235,9 +235,9 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 	for i := 0; i < s.AccessCount; i++ {
 		Roles = append(Roles, setup.Role{
 			Role: "Access"},
-			//Name: s.Accesses[i].Name,
-			//User: s.Accesses[i].UserName,
-			//Code: s.Accesses[i].code})
+		//Name: s.Accesses[i].Name,
+		//User: s.Accesses[i].UserName,
+		//Code: s.Accesses[i].code})
 		)
 	}
 	for i := 0; i < s.MasterCount; i++ {

@@ -30,10 +30,8 @@ func (g *Gui) Welcome() {
 	grid := tview.NewGrid().SetRows(-5, -5, -1, -5, -1, -5, -1, -5).SetColumns(-6, -1, -3, -6, -6).
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetes), 1, 1, 1, 3, 1, 1, false).
 		AddItem(listSetup, 2, 1, 1, 2, 0, 0, true).
-
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetesInstall), 3, 2, 1, 2, 0, 0, false).
 		AddItem(listManage, 4, 1, 1, 2, 2, 1, true).
-
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetesManage), 5, 2, 1, 2, 0, 0, false).
 		AddItem(listExit, 6, 1, 1, 2, 3, 1, true)
 

@@ -229,13 +229,9 @@ func NewSampleSetupStructure() *Setup {
 		NodeCount:   0,
 		AccessCount: 0,
 
-		Masters: []Master{
+		Masters: []Master{},
 
-		},
-
-		Nodes: []Node{
-
-		},
+		Nodes: []Node{},
 
 		Docker:     *Dockersetup,
 		Etcd:       *EtcdSetup,
