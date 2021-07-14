@@ -49,7 +49,8 @@ Copy the config file of the target cluster to the `~/.kube/config` directory of 
 
 ### Quick start
 ```
-    sh start.sh
+    go build
+    ./installer
 ```
 
 ### Roadmap
