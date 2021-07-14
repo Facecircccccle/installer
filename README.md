@@ -1,5 +1,6 @@
 
 ## EB-xxxxx
+[![Build Status](https://travis-ci.com/Facecircccccle/installer.svg?branch=main)](https://travis-ci.com/Facecircccccle/installer)
 
 EB-xxxx is a one-click installer for beginners that can install the basic Kubernetes cluster. 
 
