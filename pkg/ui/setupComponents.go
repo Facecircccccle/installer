@@ -44,7 +44,6 @@ func NewFeature(g *Gui, m *menu.Menus) *MyGrid {
 			AddItem(feature, 0, 0, 1, 1, 0, 0, true),
 	}
 
-
 	feature.AddButton("done", func() {
 		g.App.SetFocus(m)
 	}).SetButtonsAlign(tview.AlignRight)
@@ -115,7 +114,6 @@ func NewRole(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *MyTable {
 	return roles
 }
 
-
 func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 	form := tview.NewForm()
 	form.SetBorder(true)
@@ -126,7 +124,7 @@ func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 	//AddInputField("Name", "", inputWidth, nil, nil).
 	//AddInputField("Username", "", inputWidth, nil, nil).
 	//AddInputField("Code", "", inputWidth, nil, nil).
-	if isHA{
+	if isHA {
 		form.AddInputField("Network Card", "", constants.InputWidth, nil, nil)
 	}
 	form.AddButton("Load", func() {
@@ -142,28 +140,28 @@ func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 			// do something
 			if role == "Master" {
 				var master setup.Master
-				if isHA{
+				if isHA {
 					master = setup.Master{
-						IPAddr: ip,
+						IPAddr:  ip,
 						NetCard: form.GetFormItemByLabel("Network Card").(*tview.InputField).GetText(),
 					}
-				}else {
+				} else {
 					master = setup.Master{
 						IPAddr: ip,
 					}
 				}
 				s.Masters = append(s.Masters, master)
 				s.MasterCount++
-			}else if role == "Node" {
+			} else if role == "Node" {
 				node := setup.Node{
 					IPAddr:   ip,
 					Allocate: setup.NewSampleNodeAllocate(),
 				}
 				s.Nodes = append(s.Nodes, node)
 				s.NodeCount++
-			}else {
+			} else {
 				access := setup.Access{
-					IPAddr:   ip,
+					IPAddr: ip,
 				}
 				s.Accesses = append(s.Accesses, access)
 				s.AccessCount++
@@ -173,7 +171,7 @@ func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 
 			g.Pages.RemovePage("form")
 			g.App.SetFocus(r)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -234,7 +232,7 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 	}
 
 	var Roles []setup.Role
-	for i:= 0; i < s.AccessCount; i++ {
+	for i := 0; i < s.AccessCount; i++ {
 		Roles = append(Roles, setup.Role{
 			Role: "Access"},
 			//Name: s.Accesses[i].Name,
@@ -242,7 +240,7 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 			//Code: s.Accesses[i].code})
 		)
 	}
-	for i:= 0; i < s.MasterCount; i++ {
+	for i := 0; i < s.MasterCount; i++ {
 		Roles = append(Roles, setup.Role{
 			Role: "Master",
 			IP:   s.Masters[i].IPAddr,
@@ -251,7 +249,7 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 			//Code: s.Masters[i].code
 		})
 	}
-	for i:= 0; i < s.NodeCount; i++ {
+	for i := 0; i < s.NodeCount; i++ {
 		Roles = append(Roles, setup.Role{
 			Role: "Node",
 			IP:   s.Nodes[i].IPAddr,
@@ -261,7 +259,7 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 		})
 	}
 
-	for i := 0; i < len(Roles); i++{
+	for i := 0; i < len(Roles); i++ {
 		table.SetCell(i+2, 0, tview.NewTableCell(Roles[i].Role).
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 
@@ -269,4 +267,3 @@ func SetRoleEntries(r *MyTable, s *setup.Setup) {
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 	}
 }
-

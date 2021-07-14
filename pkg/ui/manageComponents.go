@@ -46,7 +46,6 @@ func Manage(g *Gui, clientset *kubernetes.Clientset) {
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
-
 func NewManageInfo() *Infos {
 	infos := &Infos{
 		TextView: tview.NewTextView().SetText("here log").SetWordWrap(true).SetWrap(true),
@@ -65,7 +64,7 @@ func NewManageMenu() *menu.Menus {
 	menus.SetBorder(true)
 	Menu := []string{"Node List", "Namespace"}
 	table := menus.Clear()
-	for i := 0; i < len(Menu); i++{
+	for i := 0; i < len(Menu); i++ {
 		cell := &tview.TableCell{
 			Text:            Menu[i],
 			Align:           tview.AlignLeft,
@@ -115,7 +114,6 @@ func NewNodeManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu
 	return nodeManage, nodeLog
 }
 
-
 func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *MyText) {
 	form := tview.NewForm()
 	form.SetBorder(true)
@@ -128,14 +126,14 @@ func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu
 		AddInputField("Code", "", constants.InputWidth, nil, nil).
 		AddInputField("docker-registries", "", constants.InputWidth, nil, nil).
 		AddButton("Load", func() {
-			nodes, err := clientset.CoreV1().Nodes().List(context.TODO(),metav1.ListOptions{})
+			nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 			if err != nil {
 				panic(err)
 			}
 			setup := setup2.NewSampleSetupStructure()
 			isHA := false
 			for i := 0; i < len(nodes.Items); i++ {
-				if strings.Contains(strings.Join(manage.FindNodeRoles(&nodes.Items[i]), ","), "master"){
+				if strings.Contains(strings.Join(manage.FindNodeRoles(&nodes.Items[i]), ","), "master") {
 					setup.MasterCount++
 					isHA = true
 				}
@@ -154,38 +152,38 @@ func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu
 
 				//获取k8s docker版本, 仓库, masterip
 				kubeVersion, containerRuntimeVersion, masterIP := manage.GetKubeInfo(clientset)
-				if dockerRegistries == ""{
+				if dockerRegistries == "" {
 					dockerRegistries = "0.0.0.0/0"
 				}
 
 				//删除当前的ansible-host, 添加[node] 192.168.48.1
 				_ = g.Command("rm -rf /etc/ansible/hosts", log)
-				_ = g.Command("sh localScript/add_ansible_host.sh " + "allnodes " + nodeIP, log)
-				_ = g.Command("sh localScript/add_ansible_host.sh " + "k8s-node " + nodeIP, log)
-				_ = g.Command("sh localScript/add_ansible_host.sh " + "k8s-master-init " + masterIP, log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes "+nodeIP, log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-node "+nodeIP, log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-init "+masterIP, log)
 
 				//在192.168.48.1上创建满足preset的节点
 				_ = g.Command("cp -r k8s-installer-fix k8s-installer", log)
 
 				//k8s
-				_ = g.Command("sed -i 's/KUBEADM_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
-				_ = g.Command("sed -i 's/KUBELET_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
-				_ = g.Command("sed -i 's/KUBECTL_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+				_ = g.Command("sed -i 's/KUBEADM_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+				_ = g.Command("sed -i 's/KUBELET_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+				_ = g.Command("sed -i 's/KUBECTL_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
 
-				_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/" + kubeVersion + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/ETCD_VERSION/" + util.GetEtcdVersion(kubeVersion) + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/COREDNS_VERSION/" + util.GetCoreDNSVersion(kubeVersion) + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
-				_ = g.Command("sed -i 's/PAUSE_VERSION/" + util.GetPauseVersion(kubeVersion) + "/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/ETCD_VERSION/"+util.GetEtcdVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/COREDNS_VERSION/"+util.GetCoreDNSVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/PAUSE_VERSION/"+util.GetPauseVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
 
 				//Docker
-				_ = g.Command("sed -i 's/DOCKER_VERSION/" + containerRuntimeVersion + "/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
-				_ = g.Command("sed -i 's/DOCKER_REGISTRIES/" + dockerRegistries + "/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
+				_ = g.Command("sed -i 's/DOCKER_VERSION/"+containerRuntimeVersion+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
+				_ = g.Command("sed -i 's/DOCKER_REGISTRIES/"+dockerRegistries+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
 
 				//addNode
-				_ = g.Command("sed -i 's/MASTER_IP/" + masterIP + "/g' k8s-installer/addNode/addnode.sh", log)
+				_ = g.Command("sed -i 's/MASTER_IP/"+masterIP+"/g' k8s-installer/addNode/addnode.sh", log)
 
 				//权限
 				_ = g.Command("chmod -R +x .", log)
@@ -202,7 +200,7 @@ func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu
 
 				g.Pages.RemovePage("form")
 				g.App.SetFocus(r)
-			}else {
+			} else {
 				modal := tview.NewModal().
 					SetText(reason).
 					AddButtons([]string{"ok"})

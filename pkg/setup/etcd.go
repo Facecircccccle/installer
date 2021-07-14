@@ -11,7 +11,7 @@ type Etcds struct {
 
 func NewEtcd() *Etcds {
 
-	etcds :=&Etcds{
+	etcds := &Etcds{
 		Form: tview.NewForm().
 			AddDropDown("Version", constants.EtcdVersion, 0, nil).
 			AddInputField("DataDir", "/var/lib/etcd", 0, nil, nil),
@@ -29,6 +29,3 @@ func (e Etcds) SetEntries(s *Setup) {
 
 	//i.SetText("etcd  " + StructureToJSON(*s))
 }
-
-
-

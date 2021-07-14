@@ -7,7 +7,7 @@ import (
 
 func New() *ui.Gui {
 	return &ui.Gui{
-		App:   tview.NewApplication(),
+		App: tview.NewApplication(),
 	}
 }
 

@@ -17,11 +17,11 @@ import (
 )
 
 type NodeOutputStructure struct {
-	Name	string
-	Status	string
-	Roles	string
-	Time	string
-	Version	string
+	Name    string
+	Status  string
+	Roles   string
+	Time    string
+	Version string
 }
 
 func GetNodeInternalIP(node *v1.Node) string {
@@ -34,19 +34,19 @@ func GetNodeInternalIP(node *v1.Node) string {
 	return "<none>"
 }
 
-func GetKubeInfo(clientset *kubernetes.Clientset) (string, string, string){
+func GetKubeInfo(clientset *kubernetes.Clientset) (string, string, string) {
 	var masterIP, containerRuntimeVersion string
-	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(),metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
 
-	if strings.Contains(nodes.Items[0].Status.NodeInfo.ContainerRuntimeVersion, "docker"){
+	if strings.Contains(nodes.Items[0].Status.NodeInfo.ContainerRuntimeVersion, "docker") {
 		containerRuntimeVersion = FormatDockerVersion(nodes.Items[0].Status.NodeInfo.ContainerRuntimeVersion)
 	}
 
 	for i := 0; i < len(nodes.Items); i++ {
-		if strings.Contains(strings.Join(FindNodeRoles(&nodes.Items[i]), ","), "master"){
+		if strings.Contains(strings.Join(FindNodeRoles(&nodes.Items[i]), ","), "master") {
 			masterIP = GetNodeInternalIP(&nodes.Items[i])
 			break
 		}
@@ -66,7 +66,7 @@ func FormatDockerVersion(version string) string {
 		buffer.WriteString(".")
 	}
 
-	return buffer.String()[0:len(buffer.String())-1]
+	return buffer.String()[0 : len(buffer.String())-1]
 }
 
 func TranslateTimestampSince(timestamp metav1.Time) string {

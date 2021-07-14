@@ -13,7 +13,7 @@ func SetCnisConnection(d *setup2.Dockers, g *Gui, m *menu.Menus, s *setup2.Setup
 		if result == true {
 			d.SetEntries(s)
 			g.App.SetFocus(m)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -34,7 +34,7 @@ func SetStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Set
 		if result == true {
 			e.SetEntries(s)
 			g.App.SetFocus(m)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -56,7 +56,7 @@ func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 		if result == true {
 			c.SetEntries(s)
 			g.App.SetFocus(networking.Form)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -76,7 +76,7 @@ func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 		if result == true {
 			networking.SetEntries(s)
 			g.App.SetFocus(netPlugin.Form)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -107,7 +107,7 @@ func SetAllocatesConnection(a *setup2.Allocates, g *Gui, m *menu.Menus, s *setup
 		if result == true {
 			a.SetEntries(s)
 			g.App.SetFocus(m)
-		}else {
+		} else {
 			modal := tview.NewModal().
 				SetText(reason).
 				AddButtons([]string{"ok"})
@@ -132,9 +132,9 @@ func SetKeybinding(g *Gui, r *MyTable, m *menu.Menus, s *setup2.Setup, isHA bool
 			ImportRoleForm(g, r, s, isHA)
 		case 'b':
 			result, reason := setup2.InputRoleBackCheck(s, isHA)
-			if result{
+			if result {
 				g.App.SetFocus(m)
-			}else {
+			} else {
 				modal := tview.NewModal().
 					SetText(reason).
 					AddButtons([]string{"ok"})
@@ -150,4 +150,3 @@ func SetKeybinding(g *Gui, r *MyTable, m *menu.Menus, s *setup2.Setup, isHA bool
 		return event
 	})
 }
-

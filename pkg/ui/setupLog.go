@@ -12,7 +12,7 @@ type SetupLog struct {
 	pages *tview.Pages
 }
 
-func (g *Gui) SetupLog(s*setup.Setup) {
+func (g *Gui) SetupLog(s *setup.Setup) {
 
 	setupInfo := NewSetupInfo(g)
 	setupMenu := NewSetupMenu(g)
@@ -59,7 +59,7 @@ func NewSetupMenu(g *Gui) *menu.Menus {
 	menus.SetBorder(true)
 	Menu := []string{"Start", "Done"}
 	table := menus.Clear()
-	for i := 0; i < len(Menu); i++{
+	for i := 0; i < len(Menu); i++ {
 		cell := &tview.TableCell{
 			Text:            Menu[i],
 			Align:           tview.AlignLeft,
@@ -71,8 +71,6 @@ func NewSetupMenu(g *Gui) *menu.Menus {
 	}
 	return menus
 }
-
-
 
 func (ansibleName *MyText) SetKeybinding(g *Gui, setupMenu *menu.Menus) {
 	ansibleName.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {

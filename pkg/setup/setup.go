@@ -6,11 +6,11 @@ import (
 
 type Setup struct {
 	MasterCount int
-	NodeCount int
+	NodeCount   int
 	AccessCount int
 
-	Masters []Master
-	Nodes []Node
+	Masters  []Master
+	Nodes    []Node
 	Accesses []Access
 
 	Docker     DockerSetup
@@ -19,7 +19,7 @@ type Setup struct {
 }
 
 type Master struct {
-	IPAddr string
+	IPAddr  string
 	NetCard string
 	//Name string
 	//UserName string
@@ -27,7 +27,7 @@ type Master struct {
 }
 
 type Node struct {
-	IPAddr   string
+	IPAddr string
 	//Name     string
 	//UserName string
 	//code 	 string
@@ -43,79 +43,79 @@ type Access struct {
 
 type DockerSetup struct {
 	RepositoryName string
-	RepositoryIP string
-	Version string
+	RepositoryIP   string
+	Version        string
 }
 
 type EtcdSetup struct {
-	Version    string
-	DataDir    string
+	Version string
+	DataDir string
 }
 
 type FeatureGates struct {
-	AllowExtTrafficLocalEndpoints	bool
-	DynamicVolumeProvisioning	bool
-	VolumeSubpath	bool
-	StorageObjectInUseProtection	bool
-	SupportIPVSProxyMode	bool
-	AdvancedAuditing	bool
-	MountPropagation	bool
-	CSIPersistentVolume	bool
-	GCERegionalPersistentDisk	bool
-	KubeletPluginsWatcher	bool
-	VolumeScheduling	bool
-	CustomPodDNS	bool
-	HugePages	bool
-	PersistentLocalVolumes	bool
-	PodPriority	bool
-	PodReadinessGates	bool
-	CustomResourcePublishOpenAPI	bool
-	CustomResourceSubresources	bool
-	CustomResourceValidation	bool
-	CustomResourceWebhookConversion	bool
-	AttachVolumeLimit	bool
-	CustomResourceDefaulting	bool
-	NodeLease	bool
-	PodShareProcessNamespace	bool
-	ResourceQuotaScopeSelectors	bool
-	ScheduleDaemonSetPods	bool
-	ServiceLoadBalancerFinalizer	bool
-	TaintNodesByCondition	bool
-	VolumeSubpathEnvExpansion	bool
-	WatchBookmark	bool
+	AllowExtTrafficLocalEndpoints   bool
+	DynamicVolumeProvisioning       bool
+	VolumeSubpath                   bool
+	StorageObjectInUseProtection    bool
+	SupportIPVSProxyMode            bool
+	AdvancedAuditing                bool
+	MountPropagation                bool
+	CSIPersistentVolume             bool
+	GCERegionalPersistentDisk       bool
+	KubeletPluginsWatcher           bool
+	VolumeScheduling                bool
+	CustomPodDNS                    bool
+	HugePages                       bool
+	PersistentLocalVolumes          bool
+	PodPriority                     bool
+	PodReadinessGates               bool
+	CustomResourcePublishOpenAPI    bool
+	CustomResourceSubresources      bool
+	CustomResourceValidation        bool
+	CustomResourceWebhookConversion bool
+	AttachVolumeLimit               bool
+	CustomResourceDefaulting        bool
+	NodeLease                       bool
+	PodShareProcessNamespace        bool
+	ResourceQuotaScopeSelectors     bool
+	ScheduleDaemonSetPods           bool
+	ServiceLoadBalancerFinalizer    bool
+	TaintNodesByCondition           bool
+	VolumeSubpathEnvExpansion       bool
+	WatchBookmark                   bool
 
-	BlockVolume	bool
-	CSIBlockVolume	bool
-	ExternalPolicyForExternalIP	bool
-	TaintBasedEvictions	bool
-	VolumePVCDataSource	bool
-	WindowsGMSA 	bool
-	WindowsRunAsUserName	bool
+	BlockVolume                 bool
+	CSIBlockVolume              bool
+	ExternalPolicyForExternalIP bool
+	TaintBasedEvictions         bool
+	VolumePVCDataSource         bool
+	WindowsGMSA                 bool
+	WindowsRunAsUserName        bool
 
-	DryRun	bool
-	EvenPodsSpread	bool
-	RotateKubeletClientCertificate	bool
-	StreamingProxyRedirects	bool
-	ExecProbeTimeout	bool
-	RuntimeClass	bool
-	SCTPSupport	bool
-	ServiceAppProtocol	bool
-	StartupProbe	bool
-	SupportNodePidsLimit	bool
-	SupportPodPidsLimit	bool
-	TokenRequest	bool
-	TokenRequestProjection	bool
-	VolumeSnapshotDataSource	bool
+	DryRun                         bool
+	EvenPodsSpread                 bool
+	RotateKubeletClientCertificate bool
+	StreamingProxyRedirects        bool
+	ExecProbeTimeout               bool
+	RuntimeClass                   bool
+	SCTPSupport                    bool
+	ServiceAppProtocol             bool
+	StartupProbe                   bool
+	SupportNodePidsLimit           bool
+	SupportPodPidsLimit            bool
+	TokenRequest                   bool
+	TokenRequestProjection         bool
+	VolumeSnapshotDataSource       bool
 
-	CRIContainerLogRotation	bool
-	EndpointSlice	bool
-	EndpointSliceNodeName	bool
-	LegacyNodeRoleBehavior	bool
-	NodeDisruptionExclusion	bool
-	PodDisruptionBudget	bool
-	RootCAConfigMap	bool
-	ServiceAccountIssuerDiscovery	bool
-	ServiceNodeExclusion	bool
+	CRIContainerLogRotation       bool
+	EndpointSlice                 bool
+	EndpointSliceNodeName         bool
+	LegacyNodeRoleBehavior        bool
+	NodeDisruptionExclusion       bool
+	PodDisruptionBudget           bool
+	RootCAConfigMap               bool
+	ServiceAccountIssuerDiscovery bool
+	ServiceNodeExclusion          bool
 }
 
 type KubernetesSetup struct {
@@ -135,37 +135,38 @@ type KubernetesSetup struct {
 }
 
 type KubeNetwork struct {
-	PodSubnet string //10.244.0.0/16
+	PodSubnet     string //10.244.0.0/16
 	ServiceSubnet string //10.96.0.0/12
-	DNSdomain    string
+	DNSdomain     string
 }
 
 type NetComponentSetup struct {
 	Component string
-	Version string
+	Version   string
 }
 
 type AdmissionPlugin struct {
-	NamespaceLifecycle bool
-	LimitRanger	bool
-	ServiceAccount	bool
-	DefaultStorageClass	bool
-	DefaultTolerationSeconds	bool
-	MutatingAdmissionWebhook	bool
-	ValidatingAdmissionWebhook	bool
-	ResourceQuota	bool
+	NamespaceLifecycle         bool
+	LimitRanger                bool
+	ServiceAccount             bool
+	DefaultStorageClass        bool
+	DefaultTolerationSeconds   bool
+	MutatingAdmissionWebhook   bool
+	ValidatingAdmissionWebhook bool
+	ResourceQuota              bool
 }
 
 type NodeAllocate struct {
 	KubeReservedCPU string
-	SysReservedCPU string
-	KubeMemory string //500Mi
-	SysMemory string
-	KubeStorage string //10Gi
-	SysStorage string
-	EvictionMemory string //500Mi
-	EvictionNodefs string //10%
+	SysReservedCPU  string
+	KubeMemory      string //500Mi
+	SysMemory       string
+	KubeStorage     string //10Gi
+	SysStorage      string
+	EvictionMemory  string //500Mi
+	EvictionNodefs  string //10%
 }
+
 func NewSampleNodeAllocate() NodeAllocate {
 	return NodeAllocate{
 		KubeReservedCPU: "1",
@@ -192,14 +193,14 @@ func NewSampleSetupStructure() *Setup {
 	}
 
 	AdmissionPlugin := &AdmissionPlugin{
-		NamespaceLifecycle: false,
-		LimitRanger: false,
-		ServiceAccount: false,
-		DefaultStorageClass: false,
-		DefaultTolerationSeconds: false,
-		MutatingAdmissionWebhook: false,
+		NamespaceLifecycle:         false,
+		LimitRanger:                false,
+		ServiceAccount:             false,
+		DefaultStorageClass:        false,
+		DefaultTolerationSeconds:   false,
+		MutatingAdmissionWebhook:   false,
 		ValidatingAdmissionWebhook: false,
-		ResourceQuota: false,
+		ResourceQuota:              false,
 	}
 
 	Kubernetessetup := &KubernetesSetup{
@@ -207,18 +208,18 @@ func NewSampleSetupStructure() *Setup {
 		SchedulerAddr:         "", //0.0.0.0
 		Networking:            *Kubenetwork,
 		Version:               "",
-		VirtualIP:				"",
+		VirtualIP:             "",
 		CertSANs:              "", //cluster.k8s.ebupt.com
 		NetComponent:          *Netcomponentsetup,
 		ControlPlaneEndpoint:  "",
-		CertificatesDir:		  "",
-		ImageRepository:		  "",
+		CertificatesDir:       "",
+		ImageRepository:       "",
 		AdmissionPlugin:       *AdmissionPlugin,
 	}
 
 	EtcdSetup := &EtcdSetup{
-		Version:	"3.4.12-0",
-		DataDir:	"/var",
+		Version: "3.4.12-0",
+		DataDir: "/var",
 	}
 
 	Dockersetup := &DockerSetup{
@@ -226,8 +227,6 @@ func NewSampleSetupStructure() *Setup {
 		RepositoryIP:   "string",
 		Version:        "docker-ce-19.03.15-3.el7",
 	}
-
-
 
 	return &Setup{
 		MasterCount: 0,
@@ -252,6 +251,3 @@ func StructureToJSON(s Setup) string {
 	jsonByte, _ := json.Marshal(s)
 	return string(jsonByte)
 }
-
-
-
