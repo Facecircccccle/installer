@@ -50,7 +50,7 @@ func SetStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Set
 	}).SetButtonsAlign(tview.AlignRight)
 }
 
-func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings, netplugin *setup2.NetPlugins, admissionplugin *setup2.AdmissionPlugins, g *Gui, m *menu.Menus, s *setup2.Setup) {
+func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings, netPlugin *setup2.NetPlugins, admissionPlugin *setup2.AdmissionPlugins, g *Gui, m *menu.Menus, s *setup2.Setup) {
 	c.AddButton("next", func() {
 		result, reason := setup2.ClusterInfoCheck(c, s)
 		if result == true {
@@ -75,7 +75,7 @@ func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 		result, reason := setup2.NetworkingCheck(networking)
 		if result == true {
 			networking.SetEntries(s)
-			g.App.SetFocus(netplugin.Form)
+			g.App.SetFocus(netPlugin.Form)
 		}else {
 			modal := tview.NewModal().
 				SetText(reason).
@@ -90,13 +90,13 @@ func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 		}
 	}).SetButtonsAlign(tview.AlignRight)
 
-	netplugin.AddButton("next", func() {
-		netplugin.SetEntries(s)
-		g.App.SetFocus(admissionplugin.Form)
+	netPlugin.AddButton("next", func() {
+		netPlugin.SetEntries(s)
+		g.App.SetFocus(admissionPlugin.Form)
 	}).SetButtonsAlign(tview.AlignRight)
 
-	admissionplugin.AddButton("done", func() {
-		admissionplugin.SetEntires(s)
+	admissionPlugin.AddButton("done", func() {
+		admissionPlugin.SetEntires(s)
 		g.App.SetFocus(m)
 	}).SetButtonsAlign(tview.AlignRight)
 }

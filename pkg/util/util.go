@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"fmt"
+	"installer/pkg/version"
 	"os"
 	"os/exec"
 	"regexp"
@@ -78,38 +79,16 @@ func StringIsInArray(target string, strArray []string) bool {
 	return false
 }
 
-
 func GetPauseVersion(kubernetesVersion string) string {
-	switch kubernetesVersion {
-	case "v1.20.5":
-		return "3.2"
-	case "v1.21.1":
-		return ""
-
-	}
-	return "3.2"
+	return version.GetComponentVersion()[kubernetesVersion].PauseVersion[0]
 }
 
 func GetCoreDNSVersion(kubernetesVersion string) string {
-	switch kubernetesVersion {
-	case "v1.20.5":
-		return "1.7.0"
-	case "v1.21.1":
-		return ""
-
-	}
-	return "1.7.0"
+	return version.GetComponentVersion()[kubernetesVersion].CoreDNSVersion[0]
 }
 
 func GetEtcdVersion(kubernetesVersion string) string {
-	switch kubernetesVersion {
-	case "v1.20.5":
-		return "3.4.13-0"
-	case "v1.21.1":
-		return ""
-
-	}
-	return "3.4.13-0"
+	return version.GetComponentVersion()[kubernetesVersion].EtcdVersion[0]
 }
 
 func StringAppend(s1 string, s2 string) string {

@@ -2,8 +2,8 @@ package setup
 
 import (
 	"github.com/rivo/tview"
-	"installer/pkg/constants"
 	"installer/pkg/util"
+	"installer/pkg/version"
 	"strings"
 )
 
@@ -41,37 +41,21 @@ func InputRoleBackCheck(setup *Setup, isHA bool) (bool, string) {
 }
 
 func EtcdAndKubernetesVersionCheck(e *Etcds, s *Setup) (bool, string) {
-	var reason = ""
-	_, version := e.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
+	_, etcdVersion := e.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
 
-	switch s.Kubernetes.Version {
-	case "v1.20.5":
-		if util.StringIsInArray(version, constants.EtcdVersionFor1205) {
-			return true, reason
-		}else {
-			selectableVersion := strings.Join(constants.EtcdVersionFor1205, ", ")
-			return false, "In kubernetes " + s.Kubernetes.Version + ", etcd version should be " + selectableVersion
-		}
-	default:
-		return true, reason
+	if util.StringIsInArray(etcdVersion, version.GetComponentVersion()[s.Kubernetes.Version].EtcdVersion){
+		return true, ""
 	}
+	return false, "In kubernetes " + s.Kubernetes.Version + ", etcd version should be " + strings.Join(version.GetComponentVersion()[s.Kubernetes.Version].EtcdVersion, ", ")
 }
 
 func DockerAndKubernetesVersionCheck(d *Dockers, s *Setup) (bool, string) {
-	var reason = ""
-	_, version := d.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
+	_, dockerVersion := d.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
 
-	switch s.Kubernetes.Version {
-	case "v1.20.5":
-		if util.StringIsInArray(version, constants.DockerVersionFor1205) {
-			return true, reason
-		}else {
-			selectableVersion := strings.Join(constants.DockerVersionFor1205, ", ")
-			return false, "In kubernetes " + s.Kubernetes.Version + ", docker version should be " + selectableVersion
-		}
-	default:
-		return true, reason
+	if util.StringIsInArray(dockerVersion, version.GetComponentVersion()[s.Kubernetes.Version].DockerVersion){
+		return true, ""
 	}
+	return false, "In kubernetes " + s.Kubernetes.Version + ", docker version should be " + strings.Join(version.GetComponentVersion()[s.Kubernetes.Version].DockerVersion, ", ")
 }
 
 func NetworkingCheck(networking *NetWorkings) (b bool, s string) {

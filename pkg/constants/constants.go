@@ -7,16 +7,14 @@ const (
 	InputWidth  = 70
 	LabelNodeRolePrefix = "node-role.kubernetes.io/"
 	NodeLabelRole = "kubernetes.io/role"
+
 )
+
 var (
-	KubernetesVersion    = []string{"v1.20.1", "v1.20.2", "v1.20.3", "v1.20.4", "v1.20.5", "v1.20.6"}
+	KubernetesVersion = []string{"v1.20.1", "v1.20.2", "v1.20.3", "v1.20.4", "v1.20.5", "v1.20.6"}
 
-	DockerVersion		 = []string{"docker-ce-19.03.15"}
-	EtcdVersion          = []string{"3.4.13-0"}
-
-	DockerVersionFor1205 = []string{"docker-ce-19.03.15", "1.20.5"}
-	EtcdVersionFor1205   = []string{"3.4.13-0"}
-
+	DockerVersion = []string{"docker-ce-19.03.15"}
+	EtcdVersion   = []string{"3.4.13-0"}
 
 	HowToSetup = "The installation section currently provides two modes: ONE master cluster installation and MULTI master (HA) cluster installation."
 
