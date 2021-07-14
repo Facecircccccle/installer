@@ -1,0 +1,6 @@
+- hosts: allnodes #填入包含所有k8s集群机器的组名
+  remote_user: root
+  tasks:
+    - name: Install docker
+      shell: /root/k8s-installer/k8s-script/osinit/installdocker.sh
+      retries: 2

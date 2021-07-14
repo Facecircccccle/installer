@@ -1,0 +1,13 @@
+- hosts: netCardCheck
+  remote_user: root
+  tasks:
+    - name: Get network card
+      shell: "ls /sys/class/net > /home/networkCard"
+    - name: Handle permission
+      shell: "chmod +x /home/networkCard"
+    - name: copy to local
+      fetch:
+        src: /home/networkCard
+        dest: /home
+    - name: delete tmp
+      shell: "rm -rf /home/networkCard"

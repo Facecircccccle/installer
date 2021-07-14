@@ -1,0 +1,15 @@
+- hosts: hostname
+  remote_user: root
+  tasks:
+    - name: set host
+      shell: hostnamectl set-hostname "{{name}}"
+#    - name: Reboot machine
+#      shell: "sleep 5 && reboot"
+#      async: 1
+#      poll: 0
+#    - name: Wait machin reboot
+#      wait_for_connection:
+#        connect_timeout: 60
+#        sleep: 5
+#        delay: 5
+#        timeout: 600

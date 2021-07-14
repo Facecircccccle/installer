@@ -1,0 +1,21 @@
+- hosts: allnodes
+  remote_user: root
+  tasks:
+#    - name: Modify hostsfile
+#      lineinfile:
+#         dest: /etc/hosts
+#         regexp: 'cluster'
+#         state: absent
+    - name: add cluster info in hosts
+      lineinfile:
+         dest: /etc/hosts
+         line: 'VIRTUAL_IP CERT_SANS'
+#- hosts: masterMain
+#  remote_user: root
+#  tasks:
+#    - name: Modify kubeinitfile
+#      lineinfile:
+#         path: /home/k8s-installer/k8s-script/cluster/kubeadmin_init.yaml
+#         regexp: '^controlPlaneEndpoint'
+#         line: 'controlPlaneEndpoint: "cluster.kube.ebupt.com:6443"'
+

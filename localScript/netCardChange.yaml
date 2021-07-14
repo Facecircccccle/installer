@@ -1,0 +1,5 @@
+- hosts: netCardChange
+  remote_user: root
+  tasks:
+    - name: Get network card
+      shell: "sh /root/k8s-installer/config/keepalivedChange.sh {{netCard}}"

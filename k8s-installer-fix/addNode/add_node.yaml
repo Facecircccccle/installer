@@ -1,0 +1,29 @@
+- hosts: k8s-master-init
+  remote_user: root
+  tasks:
+    - name: Get join token
+      shell: "kubeadm token create --print-join-command > /home/join_token.sh"
+    - name: Set fact token
+      shell: "chmod +x /home/join_token.sh"
+    - name: copy to local
+      fetch:
+        src: /home/join_token.sh
+        dest: /home
+    - name: delete tmp sh
+      shell: "rm -rf /home/join_token.sh"
+
+
+- hosts: k8s-node
+  remote_user: root
+  tasks:
+    - name: copy to node
+      copy:
+        src:  /home/master1/home/join_token.sh
+        dest: /home
+        mode: 0755 
+    - name: reset node
+      shell: /root/k8s-installer/k8s-script/cluster/reset_k8s_master.sh
+    - name: set node
+      shell: /home/join_token.sh
+    - name: delete tmp sh
+      shell: "rm -rf /home/join_token.sh"

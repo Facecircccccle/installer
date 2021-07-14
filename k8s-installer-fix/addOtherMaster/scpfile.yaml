@@ -1,0 +1,42 @@
+- hosts: k8s-master-init
+  remote_user: root
+  tasks: 
+   - name: fetch cafiles from masterMain 
+     fetch:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      mode: 0755
+     with_items:  
+      - { src: '/etc/kubernetes/pki/ca.crt', dest: '/home/cafile' }
+      - { src: '/etc/kubernetes/pki/ca.key', dest: '/home/cafile' }      
+      - { src: '/etc/kubernetes/pki/sa.key', dest: '/home/cafile' }
+      - { src: '/etc/kubernetes/pki/sa.pub', dest: '/home/cafile' }
+      - { src: '/etc/kubernetes/pki/front-proxy-ca.key', dest: '/home/cafile' }
+      - { src: '/etc/kubernetes/pki/front-proxy-ca.crt', dest: '/home/cafile' }
+      - { src: '/etc/kubernetes/pki/etcd/ca.crt', dest: '/home/cafile/etcd/'}
+      - { src: '/etc/kubernetes/pki/etcd/ca.key', dest: '/home/cafile/etcd/' }
+- hosts: k8s-master-other
+  remote_user: root
+  tasks:
+   - name: reset node
+     shell: "/root/k8s-installer/k8s-script/cluster/reset_k8s_master.sh" #从master加入之前，在这里reset，然后才能scp拷贝证书，不然就会被reset掉
+   - name: Clean files
+     file: path=/etc/kubernetes/pki state=absent
+   - name: create dir
+     shell: "mkdir -p /etc/kubernetes/pki/etcd"
+   - name: copy ca files
+     copy:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      mode: 0755
+     with_items:
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/ca.crt', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/ca.key', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/sa.key', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/sa.pub', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/front-proxy-ca.key', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/master1/etc/kubernetes/pki/front-proxy-ca.crt', dest: '/etc/kubernetes/pki/' }
+      - { src: '/home/cafile/etcd/master1/etc/kubernetes/pki/etcd/ca.crt', dest: '/etc/kubernetes/pki/etcd/'}
+      - { src: '/home/cafile//etcd/master1/etc/kubernetes/pki/etcd/ca.key', dest: '/etc/kubernetes/pki/etcd/' }
+
+

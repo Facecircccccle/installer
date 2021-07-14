@@ -1,0 +1,45 @@
+#定制master各组件的启动参数，可以通过给kubeadm init命令传入--config来指定本地的配置文件，在该文件中对期望的参数进行设置
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+etcd:
+  local:
+    imageRepository: "registry.cn-hangzhou.aliyuncs.com/google_containers"
+    imageTag: "ETCD_VERSION"
+    dataDir: "ETCD_DATA_DIR"
+    serverCertSANs:
+    - "ETCD_SERVER_CERT_SANS"
+controllerManager:
+  extraArgs:
+    bind-address: CONTROLLER_MANAGER_ADDRESS
+    feature-gates: "PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"
+scheduler:
+  extraArgs:
+    address: SCHEDULER_ADDRESS
+    feature-gates: "PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"
+clusterName: CLUSTER_NAME
+kubernetesVersion: KUBEADM_VERSION
+networking:
+  podSubnet: POD_SUBNET
+  serviceSubnet: SERVICE_SUBNET
+  dnsDomain: "DNS_DOMAIN"
+apiServer:
+  extraArgs:
+    enable-admission-plugins: NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota
+    feature-gates: "PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"
+  certSANs:
+  - "CERT_SANS"
+controlPlaneEndpoint: "CONTROL_PLANE_ENDPOINT"
+certificatesDir: "CERTIFICATES_DIR"
+imageRepository: "IMAGE_REPOSITORY"
+useHyperKubeImage: USE_HYPER_KUBE_IMAGE
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: "ipvs"
+
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+# kubelet specific options here
+

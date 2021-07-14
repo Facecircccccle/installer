@@ -1,0 +1,38 @@
+﻿#主master执行
+- hosts: k8s-master-init
+  remote_user: root
+  tasks:
+    - name: Install LB
+      shell: /root/k8s-installer/k8s-script/osinit/installLB.sh
+      retries: 2
+    - name: copy config file     
+      shell: mv /root/k8s-installer/config/keepalived.conf /etc/keepalived/
+    - name: copy config file2
+      shell: mv /root/k8s-installer/config/haproxy.cfg /etc/haproxy/
+ #从master执行
+- hosts: k8s-master-other
+  remote_user: root
+  tasks:
+    - name: Install LB
+      shell: /root/k8s-installer/k8s-script/osinit/installLB.sh
+      retries: 2
+    - name: copy config file    
+      shell: mv /root/k8s-installer/config/keepalived.conf /etc/keepalived/
+    - name: copy config file2
+      shell: mv /root/k8s-installer/config/haproxy.cfg /etc/haproxy/
+    - name: Modify Keepalived cfg1
+      lineinfile:
+         dest: /etc/keepalived/keepalived.conf
+         regexp: '^    state'
+         line: '    state BACKUP'
+    - name: Modify Keepalived cfg
+      lineinfile:
+         dest: /etc/keepalived/keepalived.conf
+         regexp: '^    priority'
+         line: '    priority 150'
+#所有master
+- hosts: k8s-master
+  remote_user: root
+  tasks:
+    - name: Init LB
+      shell: /root/k8s-installer/LB/initLB.sh  #启动Haproxy以及keepalived

@@ -1,0 +1,8 @@
+#上传给各个机器文件
+- hosts: allnodes        #此处填入所有机器组名
+  remote_user: root
+  tasks:
+    - name: Clean files
+      file: path=/root/k8s-installer state=absent
+    - name: Update shell
+      unarchive: src=k8s-installer.tar.gz dest=/root

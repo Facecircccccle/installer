@@ -1,0 +1,31 @@
+- hosts: k8s-master-init
+  remote_user: root
+  tasks:
+    - name: delete tmp sh
+      shell: "rm -rf /home/join_token.sh"
+    - name: Get join token
+      shell: "kubeadm token create --print-join-command > /home/join_token.sh"
+    - name: add control plane
+      shell: sed -i 's/$/&'--control-plane'/' /home/join_token.sh
+    - name: Set fact token
+      shell: "chmod +x /home/join_token.sh"
+    - name: copy to local
+      fetch:
+        src: /home/join_token.sh
+        dest: /home
+    - name: delete tmp sh
+      shell: "rm -rf /home/join_token.sh"
+
+
+- hosts: k8s-master-other
+  remote_user: root
+  tasks:
+    - name: copy to node
+      copy:
+        src:  /home/master1/home/join_token.sh
+        dest: /home
+        mode: 0755       
+    - name: set node
+      shell: /home/join_token.sh
+    - name: delete tmp sh
+      shell: "rm -rf /home/join_token.sh"

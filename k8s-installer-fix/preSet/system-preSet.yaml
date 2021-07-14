@@ -1,0 +1,9 @@
+- hosts: allnodes
+  remote_user: root
+  tasks:
+    - name: setup centos
+      shell: /root/k8s-installer/k8s-script/osinit/initsystem.sh
+    - name: Reboot machine
+      shell: "sleep 5 && reboot"
+      async: 1
+      poll: 0

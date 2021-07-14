@@ -1,0 +1,13 @@
+- hosts: k8s-master-init
+  remote_user: root
+  tasks:
+    - name: Get join token
+      shell: "kubectl get node > /home/getNode"
+    - name: Set fact token
+      shell: "chmod +x /home/getNode"
+    - name: copy to local
+      fetch:
+        src: /home/getNode
+        dest: /home
+    - name: delete tmp sh
+      shell: "rm -rf /home/getNode"

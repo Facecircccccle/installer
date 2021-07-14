@@ -1,0 +1,9 @@
+- hosts: k8s-master-init
+  remote_user: root
+  tasks:
+    - name: reset node
+      shell: /root/k8s-installer/k8s-script/cluster/reset_k8s_master.sh
+    - name: init-Master
+      shell: /root/k8s-installer/k8s-script/cluster/init_first_master.sh
+    - name: pack k8s setting
+      shell: /root/k8s-installer/k8s-script/pack_k8s_setting.sh
