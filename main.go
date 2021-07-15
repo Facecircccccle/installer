@@ -5,6 +5,7 @@ import (
 	"installer/pkg/ui"
 )
 
+// New return the new Gui structure.
 func New() *ui.Gui {
 	return &ui.Gui{
 		App: tview.NewApplication(),
