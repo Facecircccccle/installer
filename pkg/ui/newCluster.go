@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// ProcessNewCluster sends commands to the remote host to complete the installation process.
 func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	processAnsibleHosts(g, s, ansibleLog)
 
