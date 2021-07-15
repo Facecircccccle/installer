@@ -96,17 +96,36 @@ func processGeneralScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 func processKubeadmConfig(s *setup.Setup) {
 	s1 := "apiVersion: kubeadm.k8s.io/v1beta1\nkind: ClusterConfiguration\n"
 
-	if s.Kubernetes.ControllerManagerAddr == "" && setup.Changed == nil {
-	} else {
-		s1 = util.StringAppend(s1, "controllerManager:\n  extraArgs:\n")
-		if s.Kubernetes.ControllerManagerAddr != "" {
-			s1 = util.StringAppend(s1, "    bind-address: "+s.Kubernetes.ControllerManagerAddr+"\n")
-		}
-		if setup.Changed != nil {
-			s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
-		}
+	inputControllerManager(s1, s)
+
+	inputScheduler(s1, s)
+
+	inputClusterInfo(s1, s)
+
+	inputNetworking(s1, s)
+
+	inputAPIServer(s1, s)
+
+	inputOtherInfo(s1, s)
+
+	util.WriteToNewFile("k8s-installer/k8s-script/cluster/kubeadmin_init.yaml", s1)
+}
+
+func inputOtherInfo(s1 string, s *setup.Setup) {
+	if s.Kubernetes.ControlPlaneEndpoint != "" {
+		s1 = util.StringAppend(s1, "controlPlaneEndpoint: \""+s.Kubernetes.ControlPlaneEndpoint+"\"\n")
 	}
 
+	if s.Kubernetes.CertificatesDir != "" {
+		s1 = util.StringAppend(s1, "certificatesDir: \""+s.Kubernetes.CertificatesDir+"\"\n")
+	}
+
+	if s.Kubernetes.ImageRepository != "" {
+		s1 = util.StringAppend(s1, "imageRepository: \""+s.Kubernetes.ImageRepository+"\"\n")
+	}
+}
+
+func inputScheduler(s1 string, s *setup.Setup) {
 	if s.Kubernetes.SchedulerAddr == "" && setup.Changed == nil {
 	} else {
 		s1 = util.StringAppend(s1, "scheduler:\n  extraArgs:\n")
@@ -117,13 +136,17 @@ func processKubeadmConfig(s *setup.Setup) {
 			s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
 		}
 	}
+}
 
+func inputClusterInfo(s1 string, s *setup.Setup) {
 	if s.Kubernetes.ClusterName != "" {
 		s1 = util.StringAppend(s1, "clusterName: "+s.Kubernetes.ClusterName+"\n")
 	}
 
 	s1 = util.StringAppend(s1, "kubernetesVersion: "+s.Kubernetes.Version+"\n")
+}
 
+func inputNetworking(s1 string, s *setup.Setup) {
 	if s.Kubernetes.Networking.PodSubnet == "" && s.Kubernetes.Networking.ServiceSubnet == "" && s.Kubernetes.Networking.DNSdomain == "" {
 	} else {
 		s1 = util.StringAppend(s1, "networking:\n")
@@ -137,7 +160,9 @@ func processKubeadmConfig(s *setup.Setup) {
 			s1 = util.StringAppend(s1, "  dnsDomain: \""+s.Kubernetes.Networking.DNSdomain+"\"\n")
 		}
 	}
+}
 
+func inputAPIServer(s1 string, s *setup.Setup) {
 	if s.Kubernetes.CertSANs == "" && setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin) == "" && setup.Changed == nil {
 	} else {
 		s1 = util.StringAppend(s1, "apiServer:\n")
@@ -155,20 +180,19 @@ func processKubeadmConfig(s *setup.Setup) {
 			}
 		}
 	}
+}
 
-	if s.Kubernetes.ControlPlaneEndpoint != "" {
-		s1 = util.StringAppend(s1, "controlPlaneEndpoint: \""+s.Kubernetes.ControlPlaneEndpoint+"\"\n")
+func inputControllerManager(s1 string, s *setup.Setup) {
+	if s.Kubernetes.ControllerManagerAddr == "" && setup.Changed == nil {
+	} else {
+		s1 = util.StringAppend(s1, "controllerManager:\n  extraArgs:\n")
+		if s.Kubernetes.ControllerManagerAddr != "" {
+			s1 = util.StringAppend(s1, "    bind-address: "+s.Kubernetes.ControllerManagerAddr+"\n")
+		}
+		if setup.Changed != nil {
+			s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
+		}
 	}
-
-	if s.Kubernetes.CertificatesDir != "" {
-		s1 = util.StringAppend(s1, "certificatesDir: \""+s.Kubernetes.CertificatesDir+"\"\n")
-	}
-
-	if s.Kubernetes.ImageRepository != "" {
-		s1 = util.StringAppend(s1, "imageRepository: \""+s.Kubernetes.ImageRepository+"\"\n")
-	}
-
-	util.WriteToNewFile("k8s-installer/k8s-script/cluster/kubeadmin_init.yaml", s1)
 }
 
 func copyScript(g *Gui, ansibleLog *MyText) {
