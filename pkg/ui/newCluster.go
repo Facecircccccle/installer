@@ -7,37 +7,93 @@ import (
 )
 
 func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+	processAnsibleHosts(g, s, ansibleLog)
 
-	_ = g.Command("rm -rf /etc/ansible/hosts", ansibleLog)
-	for i := 0; i < s.MasterCount; i++ {
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Masters[i].IPAddr, ansibleLog)
-		_ = g.Command("sed -i 's/"+s.Masters[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
-		if i == 0 {
-			_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-init "+"master1 ansible_host="+s.Masters[i].IPAddr, ansibleLog)
-		} else {
-			_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-other "+s.Masters[i].IPAddr, ansibleLog)
-		}
-	}
+	copyScript(g, ansibleLog)
+	processKubeadmConfig(s)
+	processGeneralScript(g, s, ansibleLog)
+	processHAScript(g, s, ansibleLog)
 
-	for i := 0; i < s.NodeCount; i++ {
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Nodes[i].IPAddr, ansibleLog)
-		_ = g.Command("sed -i 's/"+s.Nodes[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-node "+s.Nodes[i].IPAddr, ansibleLog)
-	}
+	processPermission(g, ansibleLog)
+	processTARScript(g, ansibleLog)
 
-	_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master:children "+"k8s-master-init", ansibleLog)
+	processSendPackage(g, ansibleLog)
+	processInstall(g, s, ansibleLog)
+
+	deleteTmpScript(g, ansibleLog)
+}
+
+func processInstall(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	if s.MasterCount > 1 {
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master:children "+"k8s-master-other", ansibleLog)
+		for i := 0; i < s.MasterCount; i++ {
+			_ = g.Command("sh localScript/add_ansible_host.sh "+"netCardChange "+s.Masters[i].IPAddr, ansibleLog)
+			_ = g.Command("ansible-playbook localScript/netCardChange.yaml -e netCard="+s.Masters[i].NetCard, ansibleLog)
+			_ = g.Command("sh localScript/delete_ansible_host.sh "+"netCardChange", ansibleLog)
+		}
+		_ = g.Command("sh startHaCluster.sh ", ansibleLog)
+	} else {
+		_ = g.Command("sh startOneMasterCluster.sh ", ansibleLog)
 	}
-	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-master", ansibleLog)
-	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-node", ansibleLog)
+}
 
-	ansibleLog.SetText(ansibleLog.GetText(false) + "Making new script...").ScrollToEnd()
-	ansibleLog.SetText(ansibleLog.GetText(false) + "Copy from template...").ScrollToEnd()
-	g.App.ForceDraw()
+func processSendPackage(g *Gui, ansibleLog *MyText) {
+	_ = g.Command("sh start.sh ", ansibleLog)
+}
 
-	_ = g.Command("cp -r k8s-installer-fix k8s-installer", ansibleLog)
+func processTARScript(g *Gui, ansibleLog *MyText) {
+	_ = g.Command("tar -zcvf k8s-installer.tar.gz k8s-installer", ansibleLog)
+}
 
+func processPermission(g *Gui, ansibleLog *MyText) {
+	_ = g.Command("chmod -R +x .", ansibleLog)
+}
+
+func deleteTmpScript(g *Gui, ansibleLog *MyText) {
+	_ = g.Command("rm -rf k8s-installer.tar.gz", ansibleLog)
+	_ = g.Command("rm -rf k8s-installer", ansibleLog)
+}
+
+func processHAScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+	if s.MasterCount > 1 {
+		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
+		_ = g.Command("sed -i 's/CERT_SANS/"+s.Kubernetes.CertSANs+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
+
+		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/addFirstMaster/oneMasterPreSet.yaml", ansibleLog)
+		_ = g.Command("sed -i 's/CERT_SANS/"+s.Kubernetes.CertSANs+"/g' k8s-installer/addFirstMaster/oneMasterPreSet.yaml", ansibleLog)
+
+		for i := 0; i < s.MasterCount; i++ {
+			s := "    server  app" + strconv.Itoa(i) + " " + s.Masters[i].IPAddr + ":6443 check"
+			_ = g.Command("sed -i '/#SET_MASTER_SERVER_HERE/a"+s+"' k8s-installer/config/haproxy.cfg", ansibleLog)
+		}
+
+		//	_ = g.Command("sed -i 's/NET_CARD/" + Setup.Kubernetes.NetCard + "/g' k8s-installer/config/keepalived.conf", ansibleLog)
+		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/config/keepalived.conf", ansibleLog)
+	}
+}
+
+func processGeneralScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+	_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/ETCD_VERSION/"+s.Etcd.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/COREDNS_VERSION/"+util.GetCoreDNSVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/PAUSE_VERSION/"+util.GetPauseVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+
+	//k8s
+	_ = g.Command("sed -i 's/KUBEADM_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
+	_ = g.Command("sed -i 's/KUBELET_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
+	_ = g.Command("sed -i 's/KUBECTL_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
+
+	//Docker
+	_ = g.Command("sed -i 's/DOCKER_VERSION/"+s.Docker.Version+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", ansibleLog)
+	_ = g.Command("sed -i 's/DOCKER_REGISTRIES/"+s.Docker.RepositoryName+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", ansibleLog)
+
+	//网络插件
+	_ = g.Command("sed -i 's/NETWORK/"+s.Kubernetes.NetComponent.Component+"/g' k8s-installer/k8s-script/cluster/init_first_master.sh", ansibleLog)
+}
+
+func processKubeadmConfig(s *setup.Setup) {
 	s1 := "apiVersion: kubeadm.k8s.io/v1beta1\nkind: ClusterConfiguration\n"
 
 	if s.Kubernetes.ControllerManagerAddr == "" && setup.Changed == nil {
@@ -112,91 +168,38 @@ func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 		s1 = util.StringAppend(s1, "imageRepository: \""+s.Kubernetes.ImageRepository+"\"\n")
 	}
 
-	//	s1 = StringAppend(s1, "useHyperKubeImage: " + Setup.Kubernetes.UseHyperKubeImage + "\n")
-
 	util.WriteToNewFile("k8s-installer/k8s-script/cluster/kubeadmin_init.yaml", s1)
+}
 
-	_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/ETCD_VERSION/"+s.Etcd.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/COREDNS_VERSION/"+util.GetCoreDNSVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/PAUSE_VERSION/"+util.GetPauseVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+func copyScript(g *Gui, ansibleLog *MyText) {
+	_ = g.Command("cp -r k8s-installer-fix k8s-installer", ansibleLog)
+	ansibleLog.SetText(ansibleLog.GetText(false) + "Making new script...").ScrollToEnd()
+	ansibleLog.SetText(ansibleLog.GetText(false) + "Copy from template...").ScrollToEnd()
+	g.App.ForceDraw()
+}
 
-	//k8s
-	_ = g.Command("sed -i 's/KUBEADM_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBELET_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBECTL_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
-
-	//Docker
-	_ = g.Command("sed -i 's/DOCKER_VERSION/"+s.Docker.Version+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", ansibleLog)
-	_ = g.Command("sed -i 's/DOCKER_REGISTRIES/"+s.Docker.RepositoryName+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", ansibleLog)
-
-	//网络插件
-	_ = g.Command("sed -i 's/NETWORK/"+s.Kubernetes.NetComponent.Component+"/g' k8s-installer/k8s-script/cluster/init_first_master.sh", ansibleLog)
-
-	if s.MasterCount > 1 {
-		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
-		_ = g.Command("sed -i 's/CERT_SANS/"+s.Kubernetes.CertSANs+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
-
-		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/addFirstMaster/oneMasterPreSet.yaml", ansibleLog)
-		_ = g.Command("sed -i 's/CERT_SANS/"+s.Kubernetes.CertSANs+"/g' k8s-installer/addFirstMaster/oneMasterPreSet.yaml", ansibleLog)
-
-		for i := 0; i < s.MasterCount; i++ {
-			s := "    server  app" + strconv.Itoa(i) + " " + s.Masters[i].IPAddr + ":6443 check"
-			_ = g.Command("sed -i '/#SET_MASTER_SERVER_HERE/a"+s+"' k8s-installer/config/haproxy.cfg", ansibleLog)
+func processAnsibleHosts(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+	_ = g.Command("rm -rf /etc/ansible/hosts", ansibleLog)
+	for i := 0; i < s.MasterCount; i++ {
+		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Masters[i].IPAddr, ansibleLog)
+		_ = g.Command("sed -i 's/"+s.Masters[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
+		if i == 0 {
+			_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-init "+"master1 ansible_host="+s.Masters[i].IPAddr, ansibleLog)
+		} else {
+			_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-other "+s.Masters[i].IPAddr, ansibleLog)
 		}
-
-		//	_ = g.Command("sed -i 's/NET_CARD/" + Setup.Kubernetes.NetCard + "/g' k8s-installer/config/keepalived.conf", ansibleLog)
-		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/config/keepalived.conf", ansibleLog)
 	}
 
-	//权限
-	_ = g.Command("chmod -R +x .", ansibleLog)
-
-	//tar script
-	_ = g.Command("tar -zcvf k8s-installer.tar.gz k8s-installer", ansibleLog)
-	//	log.SetText(log.GetText(false) + outTarScript)
-
-	_ = g.Command("sh start.sh ", ansibleLog)
-
-	if s.MasterCount > 1 {
-		for i := 0; i < s.MasterCount; i++ {
-			//添加到hosts
-			_ = g.Command("sh localScript/add_ansible_host.sh "+"netCardChange "+s.Masters[i].IPAddr, ansibleLog)
-			//发一个命令 让20
-			_ = g.Command("ansible-playbook localScript/netCardChange.yaml -e netCard="+s.Masters[i].NetCard, ansibleLog)
-			//	_ = g.Command("ansible-playbook localScript/netCardChange.yaml -e netCard=ens33", ansibleLog)
-
-			_ = g.Command("sh localScript/delete_ansible_host.sh "+"netCardChange", ansibleLog)
-			ansibleLog.SetText(ansibleLog.GetText(false) + s.Masters[i].IPAddr + " " + s.Masters[i].NetCard).ScrollToEnd()
-		}
-		_ = g.Command("sh startHaCluster.sh ", ansibleLog)
-	} else {
-		_ = g.Command("sh startOneMasterCluster.sh ", ansibleLog)
-		//	//运行 preset.sh
-		//	_ = g.Command("sh startPreSet.sh ", ansibleLog)
-		//
-		//	ansibleLog.SetText(ansibleLog.GetText(false) + "preSet success, docker k8s etcd already installed\n").ScrollToEnd()
-		//	g.App.ForceDraw()
-		//
-		//	ansibleLog.SetText(ansibleLog.GetText(false) + "init master...\n").ScrollToEnd()
-		//	g.App.ForceDraw()
-		//
-		/////运行 master.sh
-		//	_ = g.Command("sh startMaster.sh ", ansibleLog)
-		//
-		//	//	ansibleLog.SetText(ansibleLog.GetText(false) + "master already joined...\n").ScrollToEnd()
-		//	g.App.ForceDraw()
-		//
-		//	ansibleLog.SetText(ansibleLog.GetText(false) + "init node...\n").ScrollToEnd()
-		//	//运行 node.sh
-		//	_ = g.Command("sh startNode.sh ", ansibleLog)
-
-		//	ansibleLog.SetText(ansibleLog.GetText(false) + "node already joined...\n").ScrollToEnd()
+	for i := 0; i < s.NodeCount; i++ {
+		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Nodes[i].IPAddr, ansibleLog)
+		_ = g.Command("sed -i 's/"+s.Nodes[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
+		_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-node "+s.Nodes[i].IPAddr, ansibleLog)
 	}
 
-	_ = g.Command("rm -rf k8s-installer.tar.gz", ansibleLog)
-	_ = g.Command("rm -rf k8s-installer", ansibleLog)
+	_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master:children "+"k8s-master-init", ansibleLog)
+	if s.MasterCount > 1 {
+		_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master:children "+"k8s-master-other", ansibleLog)
+	}
+	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-master", ansibleLog)
+	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-node", ansibleLog)
 }
