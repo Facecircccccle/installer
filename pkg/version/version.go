@@ -1,5 +1,6 @@
 package version
 
+// ComponentVersion struct.
 type ComponentVersion struct {
 	DockerVersion  []string
 	EtcdVersion    []string
@@ -8,37 +9,37 @@ type ComponentVersion struct {
 }
 
 var version = map[string]ComponentVersion{
-	"1.20.1": {
+	"v1.20.1": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
 		PauseVersion:   []string{"3.2"},
 	},
-	"1.20.2": {
+	"v1.20.2": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
 		PauseVersion:   []string{"3.2"},
 	},
-	"1.20.3": {
+	"v1.20.3": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
 		PauseVersion:   []string{"3.2"},
 	},
-	"1.20.4": {
+	"v1.20.4": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
 		PauseVersion:   []string{"3.2"},
 	},
-	"1.20.5": {
+	"v1.20.5": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
 		PauseVersion:   []string{"3.2"},
 	},
-	"1.20.6": {
+	"v1.20.6": {
 		DockerVersion:  []string{"docker-ce-19.03.15"},
 		EtcdVersion:    []string{"3.4.13-0"},
 		CoreDNSVersion: []string{"1.7.0"},
@@ -46,6 +47,7 @@ var version = map[string]ComponentVersion{
 	},
 }
 
+// GetComponentVersion get the version map.
 func GetComponentVersion() map[string]ComponentVersion {
 	return version
 }
