@@ -14,11 +14,12 @@ import (
 	"strings"
 )
 
+// Manage implements cluster management operations.
 func Manage(g *Gui, clientset *kubernetes.Clientset) {
 
-	manageInfo := NewManageInfo()
-	manageMenu := NewManageMenu()
-	manageNode := NewNodeManageGrid(g, clientset, manageInfo, manageMenu)
+	manageInfo := newManageInfo()
+	manageMenu := newManageMenu()
+	manageNode := newNodeManageGrid(g, clientset, manageInfo, manageMenu)
 
 	gridSetupLog := tview.NewGrid().SetRows(10, -1).SetColumns(-1, -5).
 		AddItem(manageInfo, 0, 0, 1, 2, 0, 0, false).
@@ -46,7 +47,7 @@ func Manage(g *Gui, clientset *kubernetes.Clientset) {
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
-func NewManageInfo() *Infos {
+func newManageInfo() *Infos {
 	infos := &Infos{
 		TextView: tview.NewTextView().SetText("here log").SetWordWrap(true).SetWrap(true),
 	}
@@ -56,7 +57,7 @@ func NewManageInfo() *Infos {
 	return infos
 }
 
-func NewManageMenu() *menu.Menus {
+func newManageMenu() *menu.Menus {
 	menus := &menu.Menus{
 		Table: tview.NewTable().SetSelectable(true, true).SetFixed(1, 1),
 	}
@@ -78,10 +79,10 @@ func NewManageMenu() *menu.Menus {
 	return menus
 }
 
-func NewNodeManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) *MyGrid {
-	nodeManage, nodeLog := NewNodeManage(g, clientset, info, m)
+func newNodeManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) *myGrid {
+	nodeManage, nodeLog := newNodeManage(g, clientset, info, m)
 
-	nodeManageGrid := &MyGrid{
+	nodeManageGrid := &myGrid{
 		Grid: tview.NewGrid().SetBorders(false).SetRows(-1, -1).
 			AddItem(nodeManage, 0, 0, 1, 1, 0, 0, true).
 			AddItem(nodeLog, 1, 0, 1, 1, 0, 0, true),
@@ -92,11 +93,11 @@ func NewNodeManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *
 
 }
 
-func NewNodeManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) (*MyTable, *MyText) {
-	nodeManage := &MyTable{
+func newNodeManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) (*myTable, *myText) {
+	nodeManage := &myTable{
 		Table: tview.NewTable().SetSelectable(true, false).SetFixed(1, 1),
 	}
-	nodeLog := &MyText{
+	nodeLog := &myText{
 		TextView: tview.NewTextView().SetWordWrap(true).SetWrap(true),
 	}
 
@@ -104,8 +105,8 @@ func NewNodeManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu
 
 	nodeManage.SetTitle("Node List").SetTitleAlign(tview.AlignCenter)
 	nodeManage.SetBorder(true)
-	SetNodeEntries(g, nodeManage, clientset, info, nodeLog)
-	SetNodeKeybinding(g, nodeManage, clientset, m, info, nodeLog)
+	setNodeEntries(g, nodeManage, clientset, info, nodeLog)
+	setNodeKeybinding(g, nodeManage, clientset, m, info, nodeLog)
 
 	nodeLog.SetTitle("Node Log").SetTitleAlign(tview.AlignCenter)
 	nodeLog.SetBorder(true)
@@ -114,7 +115,7 @@ func NewNodeManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu
 	return nodeManage, nodeLog
 }
 
-func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *MyText) {
+func importNodeForm(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
 	form := tview.NewForm()
 	form.SetBorder(true)
 	form.SetTitleAlign(tview.AlignCenter)
@@ -196,7 +197,7 @@ func ImportNodeForm(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu
 				_ = g.Command("sh startPreSet.sh ", log)
 				_ = g.Command("sh startNode.sh ", log)
 
-				SetNodeEntries(g, r, clientset, i, log)
+				setNodeEntries(g, r, clientset, i, log)
 
 				g.Pages.RemovePage("form")
 				g.App.SetFocus(r)

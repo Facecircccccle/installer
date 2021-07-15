@@ -13,21 +13,21 @@ import (
 	"sync"
 )
 
-type MyGrid struct {
+type myGrid struct {
 	*tview.Grid
 }
 
-type MyTable struct {
+type myTable struct {
 	*tview.Table
 }
 
-type MyText struct {
+type myText struct {
 	*tview.TextView
 }
 
-func (g *Gui) Command(cmd string, log *MyText) error {
-	//c := exec.Command("cmd", "/C", cmd) 	// windows
-	c := exec.Command("bash", "-c", cmd) // mac or linux
+// Command processes shell command and output result in UI.
+func (g *Gui) Command(cmd string, log *myText) error {
+	c := exec.Command("bash", "-c", cmd)
 	stdout, err := c.StdoutPipe()
 	if err != nil {
 		return err

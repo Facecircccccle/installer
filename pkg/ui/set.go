@@ -9,9 +9,9 @@ import (
 // SetupChoice provides ways to setup cluster.
 func (g *Gui) SetupChoice() {
 
-	listOneMaster := Newlist("One Master Setup")
-	listBack := Newlist("Back")
-	listHA := Newlist("Multi Master(HA) Setup")
+	listOneMaster := newlist("One Master Setup")
+	listBack := newlist("Back")
+	listHA := newlist("Multi Master(HA) Setup")
 
 	gridSetup := tview.NewGrid().SetRows(-4, -4, -1, -4, -1, -4, -1, -4, -4).SetColumns(-6, -1, -3, -6, -6).
 		AddItem(tview.NewTextView().SetText(constants.HowToSetup), 1, 1, 1, 3, 1, 1, false).
@@ -26,7 +26,7 @@ func (g *Gui) SetupChoice() {
 		switch key := event.Key(); key {
 		case tcell.KeyEnter:
 			g.Pages.RemovePage("Setup")
-			g.InitGUI(false)
+			g.initGUI(false)
 		case tcell.KeyTAB, tcell.KeyDown:
 			g.App.SetFocus(listHA)
 		case tcell.KeyUp:
@@ -50,7 +50,7 @@ func (g *Gui) SetupChoice() {
 		switch key := event.Key(); key {
 		case tcell.KeyEnter:
 			g.Pages.RemovePage("Setup")
-			g.InitGUI(true)
+			g.initGUI(true)
 		case tcell.KeyTAB, tcell.KeyDown:
 			g.App.SetFocus(listBack)
 		case tcell.KeyUp:

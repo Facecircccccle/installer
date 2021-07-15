@@ -5,7 +5,7 @@ import (
 	"installer/pkg/constants"
 )
 
-// Docker struct.
+// Dockers struct.
 type Dockers struct {
 	*tview.Form
 }

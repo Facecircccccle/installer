@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func SetNodeKeybinding(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *MyText) {
+func setNodeKeybinding(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
 	r.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		//g.setGlobalKeybinding(event)
 		switch event.Key() {
@@ -21,7 +21,7 @@ func SetNodeKeybinding(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *m
 		}
 		switch event.Rune() {
 		case 'i':
-			ImportNodeForm(g, r, clientset, m, i, log)
+			importNodeForm(g, r, clientset, m, i, log)
 		case 'b':
 			g.App.SetFocus(m)
 		}
@@ -30,7 +30,7 @@ func SetNodeKeybinding(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *m
 
 }
 
-func SetNodeEntries(g *Gui, r *MyTable, clientset *kubernetes.Clientset, i *Infos, log *MyText) {
+func setNodeEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
 	table := r.Clear()
 
 	headers := []string{

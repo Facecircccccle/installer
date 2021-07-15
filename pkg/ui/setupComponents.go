@@ -8,11 +8,11 @@ import (
 	"installer/pkg/setup"
 )
 
-func NewCnis(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
+func newCnis(g *Gui, m *menu.Menus, s *setup.Setup) *myGrid {
 	docker := setup.NewDocker()
-	SetCnisConnection(docker, g, m, s)
+	setCnisConnection(docker, g, m, s)
 
-	cnis := &MyGrid{
+	cnis := &myGrid{
 		Grid: tview.NewGrid().SetRows(-1, -2).SetBorders(false).
 			AddItem(docker, 0, 0, 1, 2, 0, 0, true),
 	}
@@ -22,11 +22,11 @@ func NewCnis(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
 	return cnis
 }
 
-func NewStorages(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
+func newStorages(g *Gui, m *menu.Menus, s *setup.Setup) *myGrid {
 	etcd := setup.NewEtcd()
-	SetStoragesConnection(etcd, g, m, s)
+	setStoragesConnection(etcd, g, m, s)
 
-	storages := &MyGrid{
+	storages := &myGrid{
 		Grid: tview.NewGrid().SetRows(-1, -2).SetBorders(false).
 			AddItem(etcd, 0, 0, 1, 2, 0, 0, true),
 	}
@@ -36,10 +36,10 @@ func NewStorages(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
 	return storages
 }
 
-func NewFeature(g *Gui, m *menu.Menus) *MyGrid {
+func newFeature(g *Gui, m *menu.Menus) *myGrid {
 	feature := setup.NewFeatures()
 
-	features := &MyGrid{
+	features := &myGrid{
 		Grid: tview.NewGrid().SetBorders(false).
 			AddItem(feature, 0, 0, 1, 1, 0, 0, true),
 	}
@@ -53,16 +53,16 @@ func NewFeature(g *Gui, m *menu.Menus) *MyGrid {
 	return features
 }
 
-func NewKubernetes(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
+func newKubernetes(g *Gui, m *menu.Menus, s *setup.Setup) *myGrid {
 
 	cluster := setup.NewCluster()
 	networking := setup.NewNetwork()
 	netplugin := setup.NewNetPlugin()
 	admissionplugin := setup.NewAdmission()
 
-	SetKubernetesConnection(cluster, networking, netplugin, admissionplugin, g, m, s)
+	setKubernetesConnection(cluster, networking, netplugin, admissionplugin, g, m, s)
 
-	kubernetes := &MyGrid{
+	kubernetes := &myGrid{
 		Grid: tview.NewGrid().SetRows(-2, -1, -1, -2).SetBorders(false).
 			AddItem(cluster, 0, 0, 1, 2, 0, 0, true).
 			AddItem(networking, 1, 0, 1, 2, 0, 0, true).
@@ -75,11 +75,11 @@ func NewKubernetes(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
 	return kubernetes
 }
 
-func NewNodeAllocates(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
+func newNodeAllocates(g *Gui, m *menu.Menus, s *setup.Setup) *myGrid {
 	allocate := setup.NewAllocate()
-	SetAllocatesConnection(allocate, g, m, s)
+	setAllocatesConnection(allocate, g, m, s)
 
-	nodeAllocates := &MyGrid{
+	nodeAllocates := &myGrid{
 		Grid: tview.NewGrid().SetRows(-1, -1).SetBorders(false).
 			AddItem(allocate, 0, 0, 1, 2, 0, 0, true),
 	}
@@ -89,10 +89,10 @@ func NewNodeAllocates(g *Gui, m *menu.Menus, s *setup.Setup) *MyGrid {
 	return nodeAllocates
 }
 
-func NewRoleGrid(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *MyGrid {
-	role := NewRole(g, m, s, isHA)
+func newRoleGrid(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *myGrid {
+	role := newRole(g, m, s, isHA)
 
-	roleGrid := &MyGrid{
+	roleGrid := &myGrid{
 		Grid: tview.NewGrid().SetBorders(false).
 			AddItem(role, 0, 0, 1, 1, 0, 0, true),
 	}
@@ -102,19 +102,19 @@ func NewRoleGrid(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *MyGrid {
 	return roleGrid
 }
 
-func NewRole(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *MyTable {
-	roles := &MyTable{
+func newRole(g *Gui, m *menu.Menus, s *setup.Setup, isHA bool) *myTable {
+	roles := &myTable{
 		Table: tview.NewTable().SetSelectable(true, false).SetFixed(1, 1),
 	}
 
 	roles.SetTitle("Role List").SetTitleAlign(tview.AlignCenter)
 	roles.SetBorder(true)
-	SetRoleEntries(roles, s)
-	SetKeybinding(g, roles, m, s, isHA)
+	setRoleEntries(roles, s)
+	setKeybinding(g, roles, m, s, isHA)
 	return roles
 }
 
-func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
+func importRoleForm(g *Gui, r *myTable, s *setup.Setup, isHA bool) {
 	form := tview.NewForm()
 	form.SetBorder(true)
 	form.SetTitleAlign(tview.AlignCenter)
@@ -167,7 +167,7 @@ func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 				s.AccessCount++
 			}
 
-			SetRoleEntries(r, s)
+			setRoleEntries(r, s)
 
 			g.Pages.RemovePage("form")
 			g.App.SetFocus(r)
@@ -194,7 +194,7 @@ func ImportRoleForm(g *Gui, r *MyTable, s *setup.Setup, isHA bool) {
 	g.Pages.AddAndSwitchToPage("form", g.Modal(form, 70, 11), true).ShowPage("main")
 }
 
-func DeleteRoleForm(r *MyTable, s *setup.Setup) {
+func deleteRoleForm(r *myTable, s *setup.Setup) {
 	row, _ := r.GetSelection()
 
 	if r.GetCell(row, 0).Text == "Access" {
@@ -209,10 +209,10 @@ func DeleteRoleForm(r *MyTable, s *setup.Setup) {
 		s.Nodes = append(s.Nodes[:row-s.AccessCount-s.MasterCount-2], s.Nodes[row-s.AccessCount-s.MasterCount-2+1:]...)
 		s.NodeCount--
 	}
-	SetRoleEntries(r, s)
+	setRoleEntries(r, s)
 }
 
-func SetRoleEntries(r *MyTable, s *setup.Setup) {
+func setRoleEntries(r *myTable, s *setup.Setup) {
 	table := r.Clear()
 
 	headers := []string{

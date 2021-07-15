@@ -28,7 +28,7 @@ type AdmissionPlugins struct {
 }
 
 // SetEntries set entries for setup structure.
-func (a AdmissionPlugins) SetEntires(s *Setup) {
+func (a AdmissionPlugins) SetEntries(s *Setup) {
 
 	s.Kubernetes.AdmissionPlugin.NamespaceLifecycle = a.GetFormItemByLabel("NamespaceLifecycle").(*tview.Checkbox).IsChecked()
 	s.Kubernetes.AdmissionPlugin.LimitRanger = a.GetFormItemByLabel("LimitRanger").(*tview.Checkbox).IsChecked()

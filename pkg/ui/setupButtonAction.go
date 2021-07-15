@@ -7,7 +7,7 @@ import (
 	setup2 "installer/pkg/setup"
 )
 
-func SetCnisConnection(d *setup2.Dockers, g *Gui, m *menu.Menus, s *setup2.Setup) {
+func setCnisConnection(d *setup2.Dockers, g *Gui, m *menu.Menus, s *setup2.Setup) {
 	d.AddButton("done", func() {
 		result, reason := setup2.DockerAndKubernetesVersionCheck(d, s)
 		if result == true {
@@ -28,7 +28,7 @@ func SetCnisConnection(d *setup2.Dockers, g *Gui, m *menu.Menus, s *setup2.Setup
 	}).SetButtonsAlign(tview.AlignRight)
 }
 
-func SetStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Setup) {
+func setStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Setup) {
 	e.AddButton("done", func() {
 		result, reason := setup2.EtcdAndKubernetesVersionCheck(e, s)
 		if result == true {
@@ -50,7 +50,7 @@ func SetStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Set
 	}).SetButtonsAlign(tview.AlignRight)
 }
 
-func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings, netPlugin *setup2.NetPlugins, admissionPlugin *setup2.AdmissionPlugins, g *Gui, m *menu.Menus, s *setup2.Setup) {
+func setKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings, netPlugin *setup2.NetPlugins, admissionPlugin *setup2.AdmissionPlugins, g *Gui, m *menu.Menus, s *setup2.Setup) {
 	c.AddButton("next", func() {
 		result, reason := setup2.ClusterInfoCheck(c, s)
 		if result == true {
@@ -96,12 +96,12 @@ func SetKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 	}).SetButtonsAlign(tview.AlignRight)
 
 	admissionPlugin.AddButton("done", func() {
-		admissionPlugin.SetEntires(s)
+		admissionPlugin.SetEntries(s)
 		g.App.SetFocus(m)
 	}).SetButtonsAlign(tview.AlignRight)
 }
 
-func SetAllocatesConnection(a *setup2.Allocates, g *Gui, m *menu.Menus, s *setup2.Setup) {
+func setAllocatesConnection(a *setup2.Allocates, g *Gui, m *menu.Menus, s *setup2.Setup) {
 	a.AddButton("done", func() {
 		result, reason := setup2.AllocateCheck(a)
 		if result == true {
@@ -121,15 +121,15 @@ func SetAllocatesConnection(a *setup2.Allocates, g *Gui, m *menu.Menus, s *setup
 	}).SetButtonsAlign(tview.AlignRight)
 }
 
-func SetKeybinding(g *Gui, r *MyTable, m *menu.Menus, s *setup2.Setup, isHA bool) {
+func setKeybinding(g *Gui, r *myTable, m *menu.Menus, s *setup2.Setup, isHA bool) {
 	r.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyDelete:
-			DeleteRoleForm(r, s)
+			deleteRoleForm(r, s)
 		}
 		switch event.Rune() {
 		case 'i':
-			ImportRoleForm(g, r, s, isHA)
+			importRoleForm(g, r, s, isHA)
 		case 'b':
 			result, reason := setup2.InputRoleBackCheck(s, isHA)
 			if result {

@@ -5,7 +5,7 @@ import (
 	"installer/pkg/constants"
 )
 
-// Etcd struct.
+// Etcds struct.
 type Etcds struct {
 	*tview.Form
 }

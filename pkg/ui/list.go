@@ -18,7 +18,7 @@ type Infos struct {
 	*tview.TextView
 }
 
-func NewInfo(g *Gui) *Infos {
+func newInfo(g *Gui) *Infos {
 	infos := &Infos{
 		TextView: tview.NewTextView().SetText("").SetWordWrap(true).SetWrap(true),
 	}
@@ -27,20 +27,20 @@ func NewInfo(g *Gui) *Infos {
 	return infos
 }
 
-func (g *Gui) InitGUI(isHA bool) {
+func (g *Gui) initGUI(isHA bool) {
 
 	setup := setup2.NewSampleSetupStructure()
 
-	info := NewInfo(g)
+	info := newInfo(g)
 	menu := menu2.NewMenu()
-	role := NewRoleGrid(g, menu, setup, isHA)
+	role := newRoleGrid(g, menu, setup, isHA)
 
-	cni := NewCnis(g, menu, setup)
-	storage := NewStorages(g, menu, setup)
-	nodeAllocate := NewNodeAllocates(g, menu, setup)
-	feature := NewFeature(g, menu)
+	cni := newCnis(g, menu, setup)
+	storage := newStorages(g, menu, setup)
+	nodeAllocate := newNodeAllocates(g, menu, setup)
+	feature := newFeature(g, menu)
 
-	kubernetes := NewKubernetes(g, menu, setup)
+	kubernetes := newKubernetes(g, menu, setup)
 
 	info.SetText(constants.SetupListTotalIntro)
 
@@ -94,7 +94,7 @@ func (g *Gui) InitGUI(isHA bool) {
 		case 6:
 			gridList.RemoveItem(c)
 			g.Pages.RemovePage("main")
-			g.SetupLog(setup)
+			g.setupLog(setup)
 
 		case 7:
 			gridList.RemoveItem(c)
