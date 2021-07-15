@@ -17,7 +17,6 @@ type MyGrid struct {
 	*tview.Grid
 }
 
-
 type MyTable struct {
 	*tview.Table
 }
@@ -28,7 +27,7 @@ type MyText struct {
 
 func (g *Gui) Command(cmd string, log *MyText) error {
 	//c := exec.Command("cmd", "/C", cmd) 	// windows
-	c := exec.Command("bash", "-c", cmd)  // mac or linux
+	c := exec.Command("bash", "-c", cmd) // mac or linux
 	stdout, err := c.StdoutPipe()
 	if err != nil {
 		return err
@@ -43,7 +42,7 @@ func (g *Gui) Command(cmd string, log *MyText) error {
 			if err != nil || err == io.EOF {
 				return
 			}
-			if readString == "\n"{
+			if readString == "\n" {
 				continue
 			}
 			util.ExecShell("echo \"" + readString + "\" >> loggg")
@@ -57,7 +56,7 @@ func (g *Gui) Command(cmd string, log *MyText) error {
 	return err
 }
 
-func (g *Gui) NewTableFromFile(s string){
+func (g *Gui) NewTableFromFile(s string) {
 	table := tview.NewTable()
 	f, err := os.Open(s)
 	if err != nil {
@@ -85,9 +84,9 @@ func (g *Gui) NewTableFromFile(s string){
 					Attributes:      tcell.AttrBold,
 				})
 			}
-		}else{
+		} else {
 			contents := strings.Fields(string(b))
-			for i, content := range contents{
+			for i, content := range contents {
 				table.SetCell(count+1, i, tview.NewTableCell(content).
 					SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 			}

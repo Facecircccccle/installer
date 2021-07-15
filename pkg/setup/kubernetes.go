@@ -20,14 +20,14 @@ type Cluster struct {
 }
 
 type Networking struct {
-	PodSubnet		string
-	ServiceSubnet	string
-	DNSdomain		string
+	PodSubnet     string
+	ServiceSubnet string
+	DNSdomain     string
 }
 
 type NetPlugin struct {
-	Plugin string
-	Version   string
+	Plugin  string
+	Version string
 }
 
 type Clusters struct {
@@ -59,22 +59,22 @@ func (a AdmissionPlugins) SetEntires(s *Setup) {
 
 func NewCluster() *Clusters {
 
-		clusters:=&Clusters{
-			Form: tview.NewForm().
-				AddInputField("ClusterName", "KubernetesCluster", 0, nil, nil).
-				AddDropDown("Version", constants.KubernetesVersion, 0, nil).
-				AddInputField("ControllerManager_bind_address", "", 0, nil, nil).
-				AddInputField("Scheduler_address", "", 0, nil, nil).
-				AddInputField("Virtual_IP", "", 0, nil, nil).
-				AddInputField("CertSANs", "", 0, nil, nil).
-				AddInputField("certificatesDir", "/etc/kubernetes/pki", 0, nil, nil).
-				AddInputField("ImageRepository", "", 0, nil, nil),
-		}
+	clusters := &Clusters{
+		Form: tview.NewForm().
+			AddInputField("ClusterName", "KubernetesCluster", 0, nil, nil).
+			AddDropDown("Version", constants.KubernetesVersion, 0, nil).
+			AddInputField("ControllerManager_bind_address", "", 0, nil, nil).
+			AddInputField("Scheduler_address", "", 0, nil, nil).
+			AddInputField("Virtual_IP", "", 0, nil, nil).
+			AddInputField("CertSANs", "", 0, nil, nil).
+			AddInputField("certificatesDir", "/etc/kubernetes/pki", 0, nil, nil).
+			AddInputField("ImageRepository", "", 0, nil, nil),
+	}
 
-		clusters.SetBorder(true).SetTitle("Cluster Info").SetTitleAlign(tview.AlignCenter)
-		clusters.SetItemPadding(0).SetBorderPadding(0, 0, 0, 1)
+	clusters.SetBorder(true).SetTitle("Cluster Info").SetTitleAlign(tview.AlignCenter)
+	clusters.SetItemPadding(0).SetBorderPadding(0, 0, 0, 1)
 
-		return clusters
+	return clusters
 
 }
 func (c Clusters) SetEntries(s *Setup) {
@@ -82,7 +82,7 @@ func (c Clusters) SetEntries(s *Setup) {
 	if s.MasterCount > 1 {
 		s.Kubernetes.VirtualIP = c.GetFormItemByLabel("Virtual_IP").(*tview.InputField).GetText()
 		s.Kubernetes.ControlPlaneEndpoint = c.GetFormItemByLabel("CertSANs").(*tview.InputField).GetText() + ":" + constants.HaPort
-	}else if  c.GetFormItemByLabel("CertSANs").(*tview.InputField).GetText() != ""{
+	} else if c.GetFormItemByLabel("CertSANs").(*tview.InputField).GetText() != "" {
 		s.Kubernetes.ControlPlaneEndpoint = c.GetFormItemByLabel("CertSANs").(*tview.InputField).GetText() + ":" + constants.ClusterPort
 	}
 
@@ -99,7 +99,7 @@ func (c Clusters) SetEntries(s *Setup) {
 
 func NewNetwork() *NetWorkings {
 
-	netWorkings:=&NetWorkings{
+	netWorkings := &NetWorkings{
 		Form: tview.NewForm().
 			AddInputField("PodSubnet", "10.244.0.0/16", 0, nil, nil).
 			AddInputField("ServiceSubnet", "10.96.0.0/12", 0, nil, nil).
@@ -120,7 +120,7 @@ func (n NetWorkings) SetEntries(s *Setup) {
 
 func NewNetPlugin() *NetPlugins {
 
-	netPlugins:=&NetPlugins{
+	netPlugins := &NetPlugins{
 		Form: tview.NewForm().
 			AddDropDown("Plugin", []string{"calico", "flannel"}, 0, nil),
 	}
@@ -139,15 +139,14 @@ func (n NetPlugins) SetEntries(s *Setup) {
 func NewAdmission() *AdmissionPlugins {
 	admissionPlugins := &AdmissionPlugins{
 		Form: tview.NewForm().
-			AddCheckbox(  "NamespaceLifecycle", false, nil).
-			AddCheckbox(  "LimitRanger", false, nil).
-			AddCheckbox(  "ServiceAccount", false, nil).
-			AddCheckbox(  "DefaultStorageClass", false, nil).
-			AddCheckbox(  "DefaultTolerationSeconds", false, nil).
-			AddCheckbox(  "MutatingAdmissionWebhook", false, nil).
-			AddCheckbox(  "ValidatingAdmissionWebhook", false, nil).
-			AddCheckbox(  "ResourceQuota", false, nil),
-
+			AddCheckbox("NamespaceLifecycle", false, nil).
+			AddCheckbox("LimitRanger", false, nil).
+			AddCheckbox("ServiceAccount", false, nil).
+			AddCheckbox("DefaultStorageClass", false, nil).
+			AddCheckbox("DefaultTolerationSeconds", false, nil).
+			AddCheckbox("MutatingAdmissionWebhook", false, nil).
+			AddCheckbox("ValidatingAdmissionWebhook", false, nil).
+			AddCheckbox("ResourceQuota", false, nil),
 	}
 
 	admissionPlugins.SetBorder(true).SetTitle("Admission Plugin Info").SetTitleAlign(tview.AlignCenter)
@@ -156,36 +155,32 @@ func NewAdmission() *AdmissionPlugins {
 	return admissionPlugins
 }
 
-
-
-
 func GetAdmissionPlugins(plugin AdmissionPlugin) string {
 	result := ""
-	if plugin.DefaultStorageClass == true{
+	if plugin.DefaultStorageClass == true {
 		result = util.StringAppend(result, "DefaultStorageClass,")
 	}
-	if plugin.DefaultTolerationSeconds == true{
+	if plugin.DefaultTolerationSeconds == true {
 		result = util.StringAppend(result, "DefaultTolerationSeconds,")
 	}
-	if plugin.LimitRanger == true{
+	if plugin.LimitRanger == true {
 		result = util.StringAppend(result, "LimitRanger,")
 	}
-	if plugin.MutatingAdmissionWebhook == true{
+	if plugin.MutatingAdmissionWebhook == true {
 		result = util.StringAppend(result, "MutatingAdmissionWebhook,")
 	}
-	if plugin.NamespaceLifecycle == true{
+	if plugin.NamespaceLifecycle == true {
 		result = util.StringAppend(result, "NamespaceLifecycle,")
 	}
-	if plugin.ResourceQuota == true{
+	if plugin.ResourceQuota == true {
 		result = util.StringAppend(result, "ResourceQuota,")
 	}
-	if plugin.ServiceAccount == true{
+	if plugin.ServiceAccount == true {
 		result = util.StringAppend(result, "ServiceAccount,")
 	}
-	if plugin.ValidatingAdmissionWebhook == true{
+	if plugin.ValidatingAdmissionWebhook == true {
 		result = util.StringAppend(result, "ValidatingAdmissionWebhook,")
 	}
 
 	return strings.TrimRight(result, ",")
 }
-

@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 )
 
-func Newlist(s string) *tview.List  {
+func Newlist(s string) *tview.List {
 	list := tview.NewList().AddItem(s, "", '>', nil)
 	list.SetShortcutColor(tcell.ColorYellow)
 	//list.SetMainTextColor(tcell.ColorBlack)
@@ -30,10 +30,8 @@ func (g *Gui) Welcome() {
 	grid := tview.NewGrid().SetRows(-5, -5, -1, -5, -1, -5, -1, -5).SetColumns(-6, -1, -3, -6, -6).
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetes), 1, 1, 1, 3, 1, 1, false).
 		AddItem(listSetup, 2, 1, 1, 2, 0, 0, true).
-
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetesInstall), 3, 2, 1, 2, 0, 0, false).
 		AddItem(listManage, 4, 1, 1, 2, 2, 1, true).
-
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetesManage), 5, 2, 1, 2, 0, 0, false).
 		AddItem(listExit, 6, 1, 1, 2, 3, 1, true)
 
@@ -80,7 +78,6 @@ func (g *Gui) Welcome() {
 
 func (g *Gui) ImportClusterForm(l *tview.List) {
 
-
 	form := tview.NewForm()
 	form.SetBorder(true)
 	form.SetTitleAlign(tview.AlignLeft)
@@ -89,16 +86,16 @@ func (g *Gui) ImportClusterForm(l *tview.List) {
 		//AddInputField("IP", "", inputWidth, nil, nil).
 		//AddInputField("Code", "", inputWidth, nil, nil).
 		AddCheckbox("config file is already in ~/.kube/config", true, nil).
-	//	AddInputField("Config addr", "", inputWidth, nil, nil).
+		//	AddInputField("Config addr", "", inputWidth, nil, nil).
 		AddButton("Load", func() {
-			if form.GetFormItemByLabel("config file is already in ~/.kube/config").(*tview.Checkbox).IsChecked(){
+			if form.GetFormItemByLabel("config file is already in ~/.kube/config").(*tview.Checkbox).IsChecked() {
 				result, reason, clientset := ConfigCheck()
-				if result{
+				if result {
 					Manage(g, clientset)
 
 					g.Pages.RemovePage("newClusterForm")
 					g.App.SetFocus(l)
-				}else {
+				} else {
 					modal := tview.NewModal().
 						SetText(reason).
 						AddButtons([]string{"ok"})
@@ -133,12 +130,14 @@ func (g *Gui) ImportClusterForm(l *tview.List) {
 
 	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 16), true).ShowPage("Welcome")
 }
+
 var Kubeconfig *string
+
 func ConfigCheck() (bool, string, *kubernetes.Clientset) {
 	var kubeconfig *string
 	var clientset *kubernetes.Clientset
 
-	if Kubeconfig == nil{
+	if Kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
 			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 		} else {

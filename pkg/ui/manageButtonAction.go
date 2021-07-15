@@ -30,7 +30,6 @@ func SetNodeKeybinding(g *Gui, r *MyTable, clientset *kubernetes.Clientset, m *m
 
 }
 
-
 func SetNodeEntries(g *Gui, r *MyTable, clientset *kubernetes.Clientset, i *Infos, log *MyText) {
 	table := r.Clear()
 
@@ -53,13 +52,13 @@ func SetNodeEntries(g *Gui, r *MyTable, clientset *kubernetes.Clientset, i *Info
 		})
 	}
 
-	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(),metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
 
 	var nodeInfo []manage.NodeOutputStructure
-	for i := 0; i < len(nodes.Items); i++{
+	for i := 0; i < len(nodes.Items); i++ {
 		node := nodes.Items[i]
 
 		conditionMap := make(map[v1.NodeConditionType]*v1.NodeCondition)
@@ -99,7 +98,7 @@ func SetNodeEntries(g *Gui, r *MyTable, clientset *kubernetes.Clientset, i *Info
 		})
 	}
 
-	for i := 0; i < len(nodeInfo); i++{
+	for i := 0; i < len(nodeInfo); i++ {
 		table.SetCell(i+2, 0, tview.NewTableCell(nodeInfo[i].Name).
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 

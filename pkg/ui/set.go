@@ -20,7 +20,6 @@ func (g *Gui) SetupChoice() {
 		AddItem(tview.NewTextView().SetText(constants.HAClusterSetup), 5, 2, 1, 2, 0, 0, false).
 		AddItem(listBack, 6, 1, 1, 2, 3, 1, true)
 
-
 	g.App.SetFocus(listOneMaster)
 	listOneMaster.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch key := event.Key(); key {

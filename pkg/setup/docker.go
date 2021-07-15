@@ -11,7 +11,7 @@ type Dockers struct {
 
 func NewDocker() *Dockers {
 
-	dockers:=&Dockers{
+	dockers := &Dockers{
 		Form: tview.NewForm().
 			AddDropDown("Version", constants.DockerVersion, 0, nil).
 			AddInputField("Registries", "core.harbor.k8s.ebupt.com", 0, nil, nil),

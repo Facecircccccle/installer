@@ -1,13 +1,12 @@
 package constants
 
 const (
-	ClusterPort = string("6443")
-	HaPort      = string("16443")
-	GateVersion = 119
-	InputWidth  = 70
+	ClusterPort         = string("6443")
+	HaPort              = string("16443")
+	GateVersion         = 119
+	InputWidth          = 70
 	LabelNodeRolePrefix = "node-role.kubernetes.io/"
-	NodeLabelRole = "kubernetes.io/role"
-
+	NodeLabelRole       = "kubernetes.io/role"
 )
 
 var (
@@ -65,4 +64,3 @@ var (
 
 	SetupListFeatureIntro = "Feature info"
 )
-

@@ -10,11 +10,10 @@ import (
 type Gui struct {
 	App   *tview.Application
 	Pages *tview.Pages
-
 }
 
 type info struct {
-	msg		string
+	msg string
 }
 
 type Infos struct {
@@ -117,6 +116,3 @@ func (g *Gui) Modal(p tview.Primitive, width, height int) tview.Primitive {
 		SetRows(0, height, 0).
 		AddItem(p, 1, 1, 1, 1, 0, 0, true)
 }
-
-
-

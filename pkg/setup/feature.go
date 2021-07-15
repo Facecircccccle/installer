@@ -11,11 +11,13 @@ import (
 type Features struct {
 	*tview.Form
 }
+
 var Changed []Feature
+
 func NewFeatures() *Features {
 
 	//item := &tview.NewGrid().new
-	features:=&Features{
+	features := &Features{
 		Form: tview.NewForm(),
 	}
 
@@ -26,10 +28,10 @@ func NewFeatures() *Features {
 		result = append(result, featureMap[i]...)
 	}
 
-	for r := range result{
+	for r := range result {
 		features.Form.AddCheckbox(result[r].Name, result[r].DefaultValue, func(checked bool) {
-			for c := range result{
-				if result[c].Name == result[r].Name && result[c].DefaultValue != checked{
+			for c := range result {
+				if result[c].Name == result[r].Name && result[c].DefaultValue != checked {
 					Changed = append(Changed, Feature{
 						Name:         result[c].Name,
 						DefaultValue: checked,
@@ -52,9 +54,6 @@ func NewFeatures() *Features {
 //func GetFeatureChange(f []Feature) []Feature{
 //	return Changed
 //}
-
-
-
 
 type Feature struct {
 	Name         string
@@ -142,7 +141,7 @@ func NewFeatureMap() map[int][]Feature {
 func GetFeatureGates(f []Feature) string {
 	result := ""
 	for i := 0; i < len(f); i++ {
-		result = util.StringAppend(result, f[i].Name+ "=" + strconv.FormatBool(f[i].DefaultValue) + ",")
+		result = util.StringAppend(result, f[i].Name+"="+strconv.FormatBool(f[i].DefaultValue)+",")
 	}
 	return strings.TrimRight(result, ",")
 }

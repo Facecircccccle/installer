@@ -12,7 +12,7 @@ type Menus struct {
 func (m Menus) SetEntries() {
 	Menu := []string{"Cluster", "Kubernetes", "Docker", "Etcd", "Node Allocate", "Feature Gate", "start", "Back"}
 	table := m.Clear()
-	for i := 0; i < len(Menu); i++{
+	for i := 0; i < len(Menu); i++ {
 		cell := &tview.TableCell{
 			Text:            Menu[i],
 			Align:           tview.AlignLeft,
