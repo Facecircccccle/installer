@@ -5,10 +5,12 @@ import (
 	"installer/pkg/constants"
 )
 
+// Etcd struct.
 type Etcds struct {
 	*tview.Form
 }
 
+// NewEtcd build the Etcd Form in UI.
 func NewEtcd() *Etcds {
 
 	etcds := &Etcds{
@@ -22,10 +24,9 @@ func NewEtcd() *Etcds {
 	return etcds
 }
 
+// SetEntries set entries for setup structure.
 func (e Etcds) SetEntries(s *Setup) {
 
 	_, s.Etcd.Version = e.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
 	s.Etcd.DataDir = e.GetFormItemByLabel("DataDir").(*tview.InputField).GetText()
-
-	//i.SetText("etcd  " + StructureToJSON(*s))
 }

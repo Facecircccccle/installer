@@ -6,6 +6,7 @@ import (
 	"installer/pkg/constants"
 )
 
+// SetupChoice provides ways to setup cluster.
 func (g *Gui) SetupChoice() {
 
 	listOneMaster := Newlist("One Master Setup")

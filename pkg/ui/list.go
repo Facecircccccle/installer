@@ -7,15 +7,13 @@ import (
 	setup2 "installer/pkg/setup"
 )
 
+// Gui struct.
 type Gui struct {
 	App   *tview.Application
 	Pages *tview.Pages
 }
 
-type info struct {
-	msg string
-}
-
+// Infos struct.
 type Infos struct {
 	*tview.TextView
 }
@@ -110,6 +108,7 @@ func (g *Gui) InitGUI(isHA bool) {
 	g.App.SetRoot(g.Pages, true).Run()
 }
 
+// Modal creates small window in UI.
 func (g *Gui) Modal(p tview.Primitive, width, height int) tview.Primitive {
 	return tview.NewGrid().
 		SetColumns(0, width, 0).

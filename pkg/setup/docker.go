@@ -5,10 +5,12 @@ import (
 	"installer/pkg/constants"
 )
 
+// Docker struct.
 type Dockers struct {
 	*tview.Form
 }
 
+// NewDocker build the Docker Form in UI.
 func NewDocker() *Dockers {
 
 	dockers := &Dockers{
@@ -22,10 +24,9 @@ func NewDocker() *Dockers {
 	return dockers
 }
 
+// SetEntries set entries for setup structure.
 func (d Dockers) SetEntries(s *Setup) {
 
 	_, s.Docker.Version = d.GetFormItemByLabel("Version").(*tview.DropDown).GetCurrentOption()
 	s.Docker.RepositoryName = d.GetFormItemByLabel("Registries").(*tview.InputField).GetText()
-
-	//i.SetText("docker  " + StructureToJSON(*s))
 }

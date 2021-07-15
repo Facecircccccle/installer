@@ -4,10 +4,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Allocates struct.
 type Allocates struct {
 	*tview.Form
 }
 
+// NewAllocate build the node allocate Form in UI.
 func NewAllocate() *Allocates {
 
 	allocates := &Allocates{
@@ -27,6 +29,7 @@ func NewAllocate() *Allocates {
 	return allocates
 }
 
+// SetEntries set entries for setup structure.
 func (a Allocates) SetEntries(s *Setup) {
 
 	allocateTmp := NodeAllocate{

@@ -8,15 +8,17 @@ import (
 	"strings"
 )
 
+// Features struct.
 type Features struct {
 	*tview.Form
 }
 
+// Changed storage the feature gates changes.
 var Changed []Feature
 
+// NewFeatures build the feature Form in UI.
 func NewFeatures() *Features {
 
-	//item := &tview.NewGrid().new
 	features := &Features{
 		Form: tview.NewForm(),
 	}
@@ -39,27 +41,21 @@ func NewFeatures() *Features {
 				}
 			}
 		})
-		//fmt.Print(result[r].name + " ")
-		//fmt.Println(result[r].defaultValue)
 	}
 
 	features.SetBorder(true).SetTitle("Feature info").SetTitleAlign(tview.AlignCenter)
 	features.SetItemPadding(0).SetBorderPadding(0, 0, 0, 10)
 
-	//info.SetText("docker page  " + StructureToJSON(*s))
-
 	return features
 }
 
-//func GetFeatureChange(f []Feature) []Feature{
-//	return Changed
-//}
-
+// Feature struct.
 type Feature struct {
 	Name         string
 	DefaultValue bool
 }
 
+// NewFeatureMap storage the relationship between feature and Kubernetes version.
 func NewFeatureMap() map[int][]Feature {
 	m := make(map[int][]Feature)
 
@@ -138,6 +134,7 @@ func NewFeatureMap() map[int][]Feature {
 	return m
 }
 
+// GetFeatureGates counts the feature gate changes.
 func GetFeatureGates(f []Feature) string {
 	result := ""
 	for i := 0; i < len(f); i++ {
