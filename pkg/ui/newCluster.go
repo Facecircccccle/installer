@@ -96,101 +96,101 @@ func processGeneralScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 func processKubeadmConfig(s *setup.Setup) {
 	s1 := "apiVersion: kubeadm.k8s.io/v1beta1\nkind: ClusterConfiguration\n"
 
-	inputControllerManager(s1, s)
+	inputControllerManager(&s1, s)
 
-	inputScheduler(s1, s)
+	inputScheduler(&s1, s)
 
-	inputClusterInfo(s1, s)
+	inputClusterInfo(&s1, s)
 
-	inputNetworking(s1, s)
+	inputNetworking(&s1, s)
 
-	inputAPIServer(s1, s)
+	inputAPIServer(&s1, s)
 
-	inputOtherInfo(s1, s)
+	inputOtherInfo(&s1, s)
 
 	util.WriteToNewFile("k8s-installer/k8s-script/cluster/kubeadmin_init.yaml", s1)
 }
 
-func inputOtherInfo(s1 string, s *setup.Setup) {
+func inputOtherInfo(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.ControlPlaneEndpoint != "" {
-		s1 = util.StringAppend(s1, "controlPlaneEndpoint: \""+s.Kubernetes.ControlPlaneEndpoint+"\"\n")
+		*s1 = util.StringAppend(*s1, "controlPlaneEndpoint: \""+s.Kubernetes.ControlPlaneEndpoint+"\"\n")
 	}
 
 	if s.Kubernetes.CertificatesDir != "" {
-		s1 = util.StringAppend(s1, "certificatesDir: \""+s.Kubernetes.CertificatesDir+"\"\n")
+		*s1 = util.StringAppend(*s1, "certificatesDir: \""+s.Kubernetes.CertificatesDir+"\"\n")
 	}
 
 	if s.Kubernetes.ImageRepository != "" {
-		s1 = util.StringAppend(s1, "imageRepository: \""+s.Kubernetes.ImageRepository+"\"\n")
+		*s1 = util.StringAppend(*s1, "imageRepository: \""+s.Kubernetes.ImageRepository+"\"\n")
 	}
 }
 
-func inputScheduler(s1 string, s *setup.Setup) {
+func inputScheduler(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.SchedulerAddr == "" && setup.Changed == nil {
 	} else {
-		s1 = util.StringAppend(s1, "scheduler:\n  extraArgs:\n")
+		*s1 = util.StringAppend(*s1, "scheduler:\n  extraArgs:\n")
 		if s.Kubernetes.SchedulerAddr != "" {
-			s1 = util.StringAppend(s1, "    address: "+s.Kubernetes.SchedulerAddr+"\n")
+			*s1 = util.StringAppend(*s1, "    address: "+s.Kubernetes.SchedulerAddr+"\n")
 		}
 		if setup.Changed != nil {
-			s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
+			*s1 = util.StringAppend(*s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
 		}
 	}
 }
 
-func inputClusterInfo(s1 string, s *setup.Setup) {
+func inputClusterInfo(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.ClusterName != "" {
-		s1 = util.StringAppend(s1, "clusterName: "+s.Kubernetes.ClusterName+"\n")
+		*s1 = util.StringAppend(*s1, "clusterName: "+s.Kubernetes.ClusterName+"\n")
 	}
 
-	s1 = util.StringAppend(s1, "kubernetesVersion: "+s.Kubernetes.Version+"\n")
+	*s1 = util.StringAppend(*s1, "kubernetesVersion: "+s.Kubernetes.Version+"\n")
 }
 
-func inputNetworking(s1 string, s *setup.Setup) {
+func inputNetworking(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.Networking.PodSubnet == "" && s.Kubernetes.Networking.ServiceSubnet == "" && s.Kubernetes.Networking.DNSdomain == "" {
 	} else {
-		s1 = util.StringAppend(s1, "networking:\n")
+		*s1 = util.StringAppend(*s1, "networking:\n")
 		if s.Kubernetes.Networking.PodSubnet != "" {
-			s1 = util.StringAppend(s1, "  podSubnet: "+s.Kubernetes.Networking.PodSubnet+"\n")
+			*s1 = util.StringAppend(*s1, "  podSubnet: "+s.Kubernetes.Networking.PodSubnet+"\n")
 		}
 		if s.Kubernetes.Networking.ServiceSubnet != "" {
-			s1 = util.StringAppend(s1, "  serviceSubnet: "+s.Kubernetes.Networking.ServiceSubnet+"\n")
+			*s1 = util.StringAppend(*s1, "  serviceSubnet: "+s.Kubernetes.Networking.ServiceSubnet+"\n")
 		}
 		if s.Kubernetes.Networking.DNSdomain != "" {
-			s1 = util.StringAppend(s1, "  dnsDomain: \""+s.Kubernetes.Networking.DNSdomain+"\"\n")
+			*s1 = util.StringAppend(*s1, "  dnsDomain: \""+s.Kubernetes.Networking.DNSdomain+"\"\n")
 		}
 	}
 }
 
-func inputAPIServer(s1 string, s *setup.Setup) {
+func inputAPIServer(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.CertSANs == "" && setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin) == "" && setup.Changed == nil {
 	} else {
-		s1 = util.StringAppend(s1, "apiServer:\n")
+		*s1 = util.StringAppend(*s1, "apiServer:\n")
 		if s.Kubernetes.CertSANs != "" {
-			s1 = util.StringAppend(s1, "  certSANs:\n  - \""+s.Kubernetes.CertSANs+"\"\n")
+			*s1 = util.StringAppend(*s1, "  certSANs:\n  - \""+s.Kubernetes.CertSANs+"\"\n")
 		}
 		if setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin) == "" && setup.Changed == nil {
 		} else {
-			s1 = util.StringAppend(s1, "  extraArgs:\n")
+			*s1 = util.StringAppend(*s1, "  extraArgs:\n")
 			if setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin) != "" {
-				s1 = util.StringAppend(s1, "    enable-admission-plugins: "+setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin)+"\n")
+				*s1 = util.StringAppend(*s1, "    enable-admission-plugins: "+setup.GetAdmissionPlugins(s.Kubernetes.AdmissionPlugin)+"\n")
 			}
 			if setup.Changed != nil {
-				s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
+				*s1 = util.StringAppend(*s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
 			}
 		}
 	}
 }
 
-func inputControllerManager(s1 string, s *setup.Setup) {
+func inputControllerManager(s1 *string, s *setup.Setup) {
 	if s.Kubernetes.ControllerManagerAddr == "" && setup.Changed == nil {
 	} else {
-		s1 = util.StringAppend(s1, "controllerManager:\n  extraArgs:\n")
+		*s1 = util.StringAppend(*s1, "controllerManager:\n  extraArgs:\n")
 		if s.Kubernetes.ControllerManagerAddr != "" {
-			s1 = util.StringAppend(s1, "    bind-address: "+s.Kubernetes.ControllerManagerAddr+"\n")
+			*s1 = util.StringAppend(*s1, "    bind-address: "+s.Kubernetes.ControllerManagerAddr+"\n")
 		}
 		if setup.Changed != nil {
-			s1 = util.StringAppend(s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
+			*s1 = util.StringAppend(*s1, "    Feature-gates: \""+setup.GetFeatureGates(setup.Changed)+"\"\n")
 		}
 	}
 }

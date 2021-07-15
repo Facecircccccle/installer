@@ -1,12 +1,26 @@
 package main
 
+import "fmt"
+
 //
 //import (
 //	"bytes"
 //	"os/exec"
 //)
 //
-//func main() {
+func main() {
+	s1 := "123"
+
+	a(&s1)
+
+	fmt.Print(s1)
+
+}
+
+func a(s *string) {
+	*s = *s + "456"
+}
+
 //	//version := "A"
 //	//execShell("sed 's/a/" + version + "/g' test.txt")
 //	//
