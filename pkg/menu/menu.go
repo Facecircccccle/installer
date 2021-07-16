@@ -5,11 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Menus struct.
 type Menus struct {
 	*tview.Table
 }
 
-func (m Menus) SetEntries() {
+func (m Menus) setEntries() {
 	Menu := []string{"Cluster", "Kubernetes", "Docker", "Etcd", "Node Allocate", "Feature Gate", "start", "Back"}
 	table := m.Clear()
 	for i := 0; i < len(Menu); i++ {
@@ -24,6 +25,7 @@ func (m Menus) SetEntries() {
 	}
 }
 
+// NewMenu build the Menu table in UI.
 func NewMenu() *Menus {
 	menus := &Menus{
 		Table: tview.NewTable().SetSelectable(true, true).SetFixed(1, 1),
@@ -31,6 +33,6 @@ func NewMenu() *Menus {
 
 	menus.SetTitle("Setup List").SetTitleAlign(tview.AlignCenter)
 	menus.SetBorder(true)
-	menus.SetEntries()
+	menus.setEntries()
 	return menus
 }

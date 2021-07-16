@@ -7,11 +7,6 @@ import (
 	"installer/pkg/setup"
 )
 
-type SetupLog struct {
-	app   *tview.Application
-	pages *tview.Pages
-}
-
 func (g *Gui) setupLog(s *setup.Setup) {
 
 	setupInfo := newSetupInfo(g)

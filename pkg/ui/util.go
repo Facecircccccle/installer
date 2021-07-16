@@ -56,6 +56,7 @@ func (g *Gui) Command(cmd string, log *myText) error {
 	return err
 }
 
+// NewTableFromFile create table UI from the formatted text.
 func (g *Gui) NewTableFromFile(s string) {
 	table := tview.NewTable()
 	f, err := os.Open(s)

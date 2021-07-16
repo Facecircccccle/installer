@@ -96,7 +96,7 @@ func ClusterInfoCheck(c *Clusters, setup *Setup) (b bool, s string) {
 		}
 		//检查vip 和master处于同一子网
 		if !util.IsVipInSameSubnet(c.GetFormItemByLabel("Virtual_IP").(*tview.InputField).GetText(), setup.Masters[0].IPAddr, util.GetNetmask(setup.Masters[0].NetCard)) {
-			return false, "Virtual IP address  needs to be in the same subnet with Maters"
+			return false, "Virtual IP address needs to be in the same subnet with Maters"
 		}
 		if c.GetFormItemByLabel("CertSANs").(*tview.InputField).GetText() == "" {
 			return false, "If the number of masters is greater than 1, CertSANs (e.g. cluster.<name>.com etc..) is needed."
