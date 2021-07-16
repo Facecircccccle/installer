@@ -1,6 +1,7 @@
 ## EB-xxxxx
 [![Build Status](https://travis-ci.com/Facecircccccle/installer.svg?branch=main)](https://travis-ci.com/Facecircccccle/installer)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Facecircccccle/installer)](https://goreportcard.com/report/github.com/Facecircccccle/installer)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Facecircccccle/installer/LICENSE)
 
 EB-xxxx is a one-click installer for beginners that can install the basic Kubernetes cluster. 
 
