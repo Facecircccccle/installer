@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// NodeOutputStructure struct.
 type NodeOutputStructure struct {
 	Name    string
 	Status  string
@@ -24,6 +25,7 @@ type NodeOutputStructure struct {
 	Version string
 }
 
+// GetNodeInternalIP
 func GetNodeInternalIP(node *v1.Node) string {
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeInternalIP {
@@ -34,6 +36,7 @@ func GetNodeInternalIP(node *v1.Node) string {
 	return "<none>"
 }
 
+// GetKubeInfo returns kubelet version, runtime version and master ip.
 func GetKubeInfo(clientset *kubernetes.Clientset) (string, string, string) {
 	var masterIP, containerRuntimeVersion string
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
@@ -55,6 +58,7 @@ func GetKubeInfo(clientset *kubernetes.Clientset) (string, string, string) {
 	return nodes.Items[0].Status.NodeInfo.KubeletVersion, containerRuntimeVersion, masterIP
 }
 
+// FormatDockerVersion.
 func FormatDockerVersion(version string) string {
 	var buffer bytes.Buffer
 	str := regexp.MustCompile("[0-9]+").FindAllString(version, -1)
@@ -69,6 +73,7 @@ func FormatDockerVersion(version string) string {
 	return buffer.String()[0 : len(buffer.String())-1]
 }
 
+// TranslateTimestampSince.
 func TranslateTimestampSince(timestamp metav1.Time) string {
 	if timestamp.IsZero() {
 		return "<unknown>"
@@ -77,6 +82,7 @@ func TranslateTimestampSince(timestamp metav1.Time) string {
 	return duration.HumanDuration(time.Since(timestamp.Time))
 }
 
+// FindNodeRoles returns node roles.
 func FindNodeRoles(node *v1.Node) []string {
 	roles := sets.NewString()
 	for k, v := range node.Labels {

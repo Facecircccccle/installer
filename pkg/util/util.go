@@ -51,6 +51,8 @@ func IsVipInSameSubnet(vip, target string, mask string) (b bool) {
 	}
 	return true
 }
+
+// GetNetmask return the net mask.
 func GetNetmask(netcard string) string {
 	mask := ExecShell("ifconfig " + netcard + " |sed -n 2p |awk -F ' ' '{print$4}'")
 	return mask
@@ -77,7 +79,7 @@ func IsDigitWithStorage(str string) bool {
 	return false
 }
 
-// IsDigitWithStorage check whether the string can be used as a digit with "%".
+// IsDigitWithPercent check whether the string can be used as a digit with "%".
 func IsDigitWithPercent(str string) bool {
 	if (IsDigit(str[0 : len(str)-1])) == false {
 		return false
