@@ -153,6 +153,7 @@ func CheckNetCard(ip string, card string) bool {
 	ExecShell("rm -rf /etc/ansible/hosts")
 	ExecShell("sh localScript/add_ansible_host.sh " + "netCardCheck " + ip)
 	ExecShell("ansible-playbook localScript/netCardCheck.yaml")
+	ExecShell("sh localScript/delete_ansible_host.sh " + "netCardCheck")
 
 	return strings.Contains(ExecShell("cat /home/"+ip+"/home/networkCard"), card)
 }

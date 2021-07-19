@@ -14,11 +14,12 @@ func AddRoleCheck(form *tview.Form, isHA bool) (b bool, s string) {
 		return false, "Illegal IP address"
 	}
 
-	util.ExecShell("rm -rf /etc/ansible/hosts")
+	//	util.ExecShell("rm -rf /etc/ansible/hosts")
 	util.ExecShell("sh localScript/add_ansible_host.sh " + "hostnameCheck " + ip)
 	if !util.SshSuccess(ip) {
 		return false, "IP can not be reached, check ssh connect"
 	}
+	util.ExecShell("sh localScript/delete_ansible_host.sh " + "hostnameCheck")
 	if isHA {
 		netCard := form.GetFormItemByLabel("Network Card").(*tview.InputField).GetText()
 		if !util.CheckNetCard(ip, netCard) {

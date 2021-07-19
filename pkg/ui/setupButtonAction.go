@@ -11,6 +11,7 @@ func setCnisConnection(d *setup2.Dockers, g *Gui, m *menu.Menus, s *setup2.Setup
 	d.AddButton("done", func() {
 		result, reason := setup2.DockerAndKubernetesVersionCheck(d, s)
 		if result == true {
+			RUNTIME_SET = true
 			d.SetEntries(s)
 			g.App.SetFocus(m)
 		} else {
@@ -32,6 +33,7 @@ func setStoragesConnection(e *setup2.Etcds, g *Gui, m *menu.Menus, s *setup2.Set
 	e.AddButton("done", func() {
 		result, reason := setup2.EtcdAndKubernetesVersionCheck(e, s)
 		if result == true {
+			STORAGE_SET = true
 			e.SetEntries(s)
 			g.App.SetFocus(m)
 		} else {
@@ -96,6 +98,7 @@ func setKubernetesConnection(c *setup2.Clusters, networking *setup2.NetWorkings,
 	}).SetButtonsAlign(tview.AlignRight)
 
 	admissionPlugin.AddButton("done", func() {
+		KUBE_SET = true
 		admissionPlugin.SetEntries(s)
 		g.App.SetFocus(m)
 	}).SetButtonsAlign(tview.AlignRight)
@@ -133,6 +136,7 @@ func setKeybinding(g *Gui, r *myTable, m *menu.Menus, s *setup2.Setup, isHA bool
 		case 'b':
 			result, reason := setup2.InputRoleBackCheck(s, isHA)
 			if result {
+				ROLE_SET = true
 				g.App.SetFocus(m)
 			} else {
 				modal := tview.NewModal().

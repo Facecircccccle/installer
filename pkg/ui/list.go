@@ -7,6 +7,13 @@ import (
 	setup2 "installer/pkg/setup"
 )
 
+var (
+	RUNTIME_SET = false
+	STORAGE_SET = false
+	KUBE_SET    = false
+	ROLE_SET    = false
+)
+
 // Gui struct.
 type Gui struct {
 	App   *tview.Application
@@ -83,18 +90,29 @@ func (g *Gui) initGUI(isHA bool) {
 			gridList.AddItem(nodeAllocate, 1, 1, 1, 1, 0, 0, true)
 			g.App.SetFocus(nodeAllocate)
 		case 5:
-
 			info.SetText(constants.SetupListFeatureIntro)
-
 			gridList.RemoveItem(c)
 			c = feature
 			gridList.AddItem(feature, 1, 1, 1, 1, 0, 0, true)
 			g.App.SetFocus(feature)
-
 		case 6:
-			gridList.RemoveItem(c)
-			g.Pages.RemovePage("main")
-			g.setupLog(setup)
+			check, obj := checkSettingReady()
+			if check {
+				gridList.RemoveItem(c)
+				g.Pages.RemovePage("main")
+				g.setupLog(setup)
+			} else {
+				modal := tview.NewModal().
+					SetText("Unable to continue start step, have to finish " + obj + " settings first.").
+					AddButtons([]string{"ok"})
+				modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+					if buttonLabel == "ok" {
+						g.Pages.RemovePage("Modal")
+						g.App.SetFocus(menu)
+					}
+				})
+				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("main")
+			}
 
 		case 7:
 			gridList.RemoveItem(c)
@@ -106,6 +124,22 @@ func (g *Gui) initGUI(isHA bool) {
 	g.Pages = tview.NewPages().
 		AddAndSwitchToPage("main", gridList, true)
 	g.App.SetRoot(g.Pages, true).Run()
+}
+
+func checkSettingReady() (result bool, reason string) {
+	if ROLE_SET == false {
+		return false, "Role part"
+	}
+	if KUBE_SET == false {
+		return false, "Kubernetes part"
+	}
+	if RUNTIME_SET == false {
+		return false, "Docker part"
+	}
+	if STORAGE_SET == false {
+		return false, "Etcd part"
+	}
+	return true, ""
 }
 
 // Modal creates small window in UI.

@@ -26,6 +26,10 @@ func (g *Gui) setupLog(s *setup.Setup) {
 			g.App.SetFocus(setupAnsibleHostAndName)
 
 		case 1:
+			ROLE_SET = false
+			RUNTIME_SET = false
+			KUBE_SET = false
+			STORAGE_SET = false
 			g.Pages.RemovePage("SetupLog")
 			g.SetupChoice()
 		}
