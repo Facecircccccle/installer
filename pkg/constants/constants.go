@@ -67,5 +67,8 @@ var (
 		"For PERCENT part, please make sure the input should end with '%'.\n" +
 		"\nKEY: Use 'TAB' to scroll down, Enter 'next' to the Setup Menu."
 
-	SetupListFeatureIntro = "Feature info"
+	SetupListFeatureIntro = "Feature Gates is a feature in Kubernetes that can be used to turn functionality on or off at the node, " +
+		"cluster, or platform level. This feature allows users to safely test functionality without worrying about the risks to critical " +
+		"components or production environments.\n " +
+		"\nKEY: We strongly recommend that you do NOT modify this area unless you are fully aware of its functionality and what you are doing."
 )

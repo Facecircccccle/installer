@@ -25,6 +25,22 @@ type NodeOutputStructure struct {
 	Version string
 }
 
+type PVOutputStructure struct {
+
+}
+
+type NamespaceOutPutStructure struct {
+
+}
+
+type SCOutPutStructure struct {
+
+}
+
+type RoleOutPutStructure struct {
+
+}
+
 // GetNodeInternalIP
 func GetNodeInternalIP(node *v1.Node) string {
 	for _, address := range node.Status.Addresses {

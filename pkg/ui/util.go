@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"installer/pkg/util"
 	"io"
 	"os"
 	"os/exec"
@@ -45,7 +44,6 @@ func (g *Gui) Command(cmd string, log *myText) error {
 			if readString == "\n" {
 				continue
 			}
-			util.ExecShell("echo \"" + readString + "\" >> loggg")
 			log.SetText(log.GetText(false) + readString)
 			log.ScrollToEnd()
 			g.App.ForceDraw()

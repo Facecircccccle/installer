@@ -107,7 +107,7 @@ func (g *Gui) importClusterForm(l *tview.List) {
 							g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 70, 10), true).ShowPage("Welcome")
 						}
 					})
-					g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("Welcome")
+					g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 10), true).ShowPage("Welcome")
 				}
 			} else {
 				modal := tview.NewModal().
@@ -120,16 +120,16 @@ func (g *Gui) importClusterForm(l *tview.List) {
 						g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 70, 10), true).ShowPage("Welcome")
 					}
 				})
-				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("Welcome")
+				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 10), true).ShowPage("Welcome")
 			}
 
-		}).
+		}).SetButtonsAlign(tview.AlignRight).
 		AddButton("Cancel", func() {
 			g.Pages.RemovePage("newClusterForm")
 			g.App.SetFocus(l)
-		})
+		}).SetButtonsAlign(tview.AlignRight)
 
-	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 16), true).ShowPage("Welcome")
+	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 10), true).ShowPage("Welcome")
 }
 
 var kubeconfig *string

@@ -7,6 +7,6 @@ roleWithBackslash="\[$roleInit\]"
 
 if [ -e $ansibleHostPath ]; then
   if cat $ansibleHostPath | grep $roleWithBackslash > /dev/null; then
-    sed -i '/'"${roleWithBackslash}"'/,+1d' $ansibleHostPath
+    sed -i '/'"${roleWithBackslash}"'/{n;d}' $ansibleHostPath
   fi
 fi

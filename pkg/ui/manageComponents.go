@@ -24,26 +24,54 @@ func Manage(g *Gui, clientset *kubernetes.Clientset) {
 	gridSetupLog := tview.NewGrid().SetRows(10, -1).SetColumns(-1, -5).
 		AddItem(manageInfo, 0, 0, 1, 2, 0, 0, false).
 		AddItem(manageMenu, 1, 0, 1, 1, 0, 0, true).
-		AddItem(manageNode, 1, 1, 1, 1, 0, 0, false)
+		AddItem(manageNode, 1, 1, 1, 1, 0, 0, false).
+		AddItem("123",1,1,1,1,1,1,false)
 
 	var c = manageNode
 	manageMenu.SetSelectedFunc(func(row int, column int) {
 		switch row {
+		//Cluster cpu...
 		case 0:
+
+		//Node
+		case 1:
 			gridSetupLog.RemoveItem(c)
 			c = manageNode
 			gridSetupLog.AddItem(manageNode, 1, 1, 1, 1, 0, 0, true)
 			g.App.SetFocus(manageNode)
-		case 1:
+		//Namespace
+		case 2:
+			gridSetupLog.RemoveItem(c)
+			c = manageNode
+			gridSetupLog.AddItem(manageNode, 1, 1, 1, 1, 0, 0, true)
+			g.App.SetFocus(manageNode)
+		//PV
+		case 3:
+			gridSetupLog.RemoveItem(c)
+			c = manageNode
+			gridSetupLog.AddItem(manageNode, 1, 1, 1, 1, 0, 0, true)
+			g.App.SetFocus(manageNode)
+		//Roles
+		case 4:
+			gridSetupLog.RemoveItem(c)
+			c = manageNode
+			gridSetupLog.AddItem(manageNode, 1, 1, 1, 1, 0, 0, true)
+			g.App.SetFocus(manageNode)
+		//sc
+		case 5:
+			gridSetupLog.RemoveItem(c)
+			c = manageNode
+			gridSetupLog.AddItem(manageNode, 1, 1, 1, 1, 0, 0, true)
+			g.App.SetFocus(manageNode)
+		//back
+		case 6:
 			g.Pages.RemovePage("Manage")
 			g.Welcome()
 		}
-
 	})
 
 	g.Pages = tview.NewPages().
 		AddAndSwitchToPage("Manage", gridSetupLog, true)
-	//g.pages.AddAndSwitchToPage("main", gridlist, true)
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
@@ -63,7 +91,7 @@ func newManageMenu() *menu.Menus {
 	}
 	menus.SetTitle("Management list").SetTitleAlign(tview.AlignCenter)
 	menus.SetBorder(true)
-	Menu := []string{"Node List", "Namespace"}
+	Menu := []string{"Cluster", "Node List", "Namespace", "PV", "Roles", "SC", "Back"}
 	table := menus.Clear()
 	for i := 0; i < len(Menu); i++ {
 		cell := &tview.TableCell{
@@ -78,6 +106,12 @@ func newManageMenu() *menu.Menus {
 
 	return menus
 }
+
+
+
+
+
+
 
 func newNodeManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) *myGrid {
 	nodeManage, nodeLog := newNodeManage(g, clientset, info, m)
