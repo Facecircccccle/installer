@@ -67,14 +67,14 @@ func processHAScript(g *Gui, s *setup.Setup, ansibleLog *myText) {
 	}
 }
 
-func processGeneralScript(g *Gui, s *setup.Setup, ansibleLog *myText) {
-	_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/ETCD_VERSION/"+s.Etcd.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/COREDNS_VERSION/"+util.GetCoreDNSVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
-	_ = g.Command("sed -i 's/PAUSE_VERSION/"+util.GetPauseVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+func processGeneralScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+	_ = g.Command("sed -i 's/kube_apiserver_version/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/kube_proxy_version/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/kube_scheduler_version/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/kube_controller_version/"+s.Kubernetes.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/etcd_version/"+s.Etcd.Version+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/coredns_version/"+util.GetCoreDNSVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
+	_ = g.Command("sed -i 's/pause_version/"+util.GetPauseVersion(s.Kubernetes.Version)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", ansibleLog)
 
 	//k8s
 	_ = g.Command("sed -i 's/KUBEADM_VERSION/"+s.Kubernetes.Version[1:len(s.Kubernetes.Version)]+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", ansibleLog)
