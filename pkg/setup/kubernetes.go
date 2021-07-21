@@ -7,44 +7,28 @@ import (
 	"strings"
 )
 
-type Cluster struct {
-	ClusterName                  string
-	Version                      string
-	ControllermanagerBindAddress string
-	SchedulerAddress             string
-	CertSANs                     string
-	ControlPlaneEndpoint         string
-	certificatesDir              string
-	ImageRepository              string
-	useHyperKubeImage            bool
-}
-
-type Networking struct {
-	PodSubnet     string
-	ServiceSubnet string
-	DNSdomain     string
-}
-
-type NetPlugin struct {
-	Plugin  string
-	Version string
-}
-
+// Clusters struct.
 type Clusters struct {
 	*tview.Form
 }
 
+// NetWorkings struct.
 type NetWorkings struct {
 	*tview.Form
 }
+
+// NetPlugins struct.
 type NetPlugins struct {
 	*tview.Form
 }
+
+// AdmissionPlugins struct.
 type AdmissionPlugins struct {
 	*tview.Form
 }
 
-func (a AdmissionPlugins) SetEntires(s *Setup) {
+// SetEntries set entries for setup structure.
+func (a AdmissionPlugins) SetEntries(s *Setup) {
 
 	s.Kubernetes.AdmissionPlugin.NamespaceLifecycle = a.GetFormItemByLabel("NamespaceLifecycle").(*tview.Checkbox).IsChecked()
 	s.Kubernetes.AdmissionPlugin.LimitRanger = a.GetFormItemByLabel("LimitRanger").(*tview.Checkbox).IsChecked()
@@ -57,6 +41,7 @@ func (a AdmissionPlugins) SetEntires(s *Setup) {
 
 }
 
+// NewCluster build the cluster Form in UI.
 func NewCluster() *Clusters {
 
 	clusters := &Clusters{
@@ -77,6 +62,8 @@ func NewCluster() *Clusters {
 	return clusters
 
 }
+
+// SetEntries set entries for setup structure.
 func (c Clusters) SetEntries(s *Setup) {
 
 	if s.MasterCount > 1 {
@@ -97,6 +84,7 @@ func (c Clusters) SetEntries(s *Setup) {
 	//i.SetText("Clusters  " + StructureToJSON(*s))
 }
 
+// NewNetwork build the network Form in UI.
 func NewNetwork() *NetWorkings {
 
 	netWorkings := &NetWorkings{
@@ -109,6 +97,8 @@ func NewNetwork() *NetWorkings {
 	netWorkings.SetItemPadding(0).SetBorderPadding(0, 0, 0, 1)
 	return netWorkings
 }
+
+// SetEntries set entries for setup structure.
 func (n NetWorkings) SetEntries(s *Setup) {
 
 	s.Kubernetes.Networking.PodSubnet = n.GetFormItemByLabel("PodSubnet").(*tview.InputField).GetText()
@@ -118,6 +108,7 @@ func (n NetWorkings) SetEntries(s *Setup) {
 	//i.SetText("network  " + StructureToJSON(*s))
 }
 
+// NewNetPlugin build the net plugin Form in UI.
 func NewNetPlugin() *NetPlugins {
 
 	netPlugins := &NetPlugins{
@@ -130,12 +121,14 @@ func NewNetPlugin() *NetPlugins {
 	return netPlugins
 }
 
+// SetEntries set entries for setup structure.
 func (n NetPlugins) SetEntries(s *Setup) {
 	_, s.Kubernetes.NetComponent.Component = n.GetFormItemByLabel("Plugin").(*tview.DropDown).GetCurrentOption()
 
 	//i.SetText("net plugins  " + StructureToJSON(*s))
 }
 
+// NewAdmission build the admission Form in UI.
 func NewAdmission() *AdmissionPlugins {
 	admissionPlugins := &AdmissionPlugins{
 		Form: tview.NewForm().
@@ -155,6 +148,7 @@ func NewAdmission() *AdmissionPlugins {
 	return admissionPlugins
 }
 
+// GetAdmissionPlugins counts the plugins changes.
 func GetAdmissionPlugins(plugin AdmissionPlugin) string {
 	result := ""
 	if plugin.DefaultStorageClass == true {

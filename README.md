@@ -1,7 +1,9 @@
-## EB-xxxxx
+## EB-Courier
 [![Build Status](https://travis-ci.com/Facecircccccle/installer.svg?branch=main)](https://travis-ci.com/Facecircccccle/installer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Facecircccccle/installer)](https://goreportcard.com/report/github.com/Facecircccccle/installer)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Facecircccccle/installer/blob/main/LICENSE)
 
-EB-xxxx is a one-click installer for beginners that can install the basic Kubernetes cluster. 
+EB-Courier is a one-click installer for beginners that can install the basic Kubernetes cluster. 
 
 Kubeadm helps users can quickly create Kubernetes clusters in line with best practices. However, they still need some configuration (IP table, swap, etc.) and installation (runtime, kubectl, etc.) as prerequisites. This project integrates these conditions with Kubeadm to help novices quickly build basic Kubernetes clusters.
 

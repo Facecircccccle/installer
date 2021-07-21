@@ -7,20 +7,25 @@ import (
 	setup2 "installer/pkg/setup"
 )
 
+var (
+	RUNTIME_SET = false
+	STORAGE_SET = false
+	KUBE_SET    = false
+	ROLE_SET    = false
+)
+
+// Gui struct.
 type Gui struct {
 	App   *tview.Application
 	Pages *tview.Pages
 }
 
-type info struct {
-	msg string
-}
-
+// Infos struct.
 type Infos struct {
 	*tview.TextView
 }
 
-func NewInfo(g *Gui) *Infos {
+func newInfo(g *Gui) *Infos {
 	infos := &Infos{
 		TextView: tview.NewTextView().SetText("").SetWordWrap(true).SetWrap(true),
 	}
@@ -29,20 +34,20 @@ func NewInfo(g *Gui) *Infos {
 	return infos
 }
 
-func (g *Gui) InitGUI(isHA bool) {
+func (g *Gui) initGUI(isHA bool) {
 
 	setup := setup2.NewSampleSetupStructure()
 
-	info := NewInfo(g)
+	info := newInfo(g)
 	menu := menu2.NewMenu()
-	role := NewRoleGrid(g, menu, setup, isHA)
+	role := newRoleGrid(g, menu, setup, isHA)
 
-	cni := NewCnis(g, menu, setup)
-	storage := NewStorages(g, menu, setup)
-	nodeAllocate := NewNodeAllocates(g, menu, setup)
-	feature := NewFeature(g, menu)
+	cni := newCnis(g, menu, setup)
+	storage := newStorages(g, menu, setup)
+	nodeAllocate := newNodeAllocates(g, menu, setup)
+	feature := newFeature(g, menu)
 
-	kubernetes := NewKubernetes(g, menu, setup)
+	kubernetes := newKubernetes(g, menu, setup)
 
 	info.SetText(constants.SetupListTotalIntro)
 
@@ -85,18 +90,29 @@ func (g *Gui) InitGUI(isHA bool) {
 			gridList.AddItem(nodeAllocate, 1, 1, 1, 1, 0, 0, true)
 			g.App.SetFocus(nodeAllocate)
 		case 5:
-
 			info.SetText(constants.SetupListFeatureIntro)
-
 			gridList.RemoveItem(c)
 			c = feature
 			gridList.AddItem(feature, 1, 1, 1, 1, 0, 0, true)
 			g.App.SetFocus(feature)
-
 		case 6:
-			gridList.RemoveItem(c)
-			g.Pages.RemovePage("main")
-			g.SetupLog(setup)
+			check, obj := checkSettingReady()
+			if check {
+				gridList.RemoveItem(c)
+				g.Pages.RemovePage("main")
+				g.setupLog(setup)
+			} else {
+				modal := tview.NewModal().
+					SetText("Unable to continue start step, have to finish " + obj + " settings first.").
+					AddButtons([]string{"ok"})
+				modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+					if buttonLabel == "ok" {
+						g.Pages.RemovePage("Modal")
+						g.App.SetFocus(menu)
+					}
+				})
+				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("main")
+			}
 
 		case 7:
 			gridList.RemoveItem(c)
@@ -110,6 +126,23 @@ func (g *Gui) InitGUI(isHA bool) {
 	g.App.SetRoot(g.Pages, true).Run()
 }
 
+func checkSettingReady() (result bool, reason string) {
+	if ROLE_SET == false {
+		return false, "Role part"
+	}
+	if KUBE_SET == false {
+		return false, "Kubernetes part"
+	}
+	if RUNTIME_SET == false {
+		return false, "Docker part"
+	}
+	if STORAGE_SET == false {
+		return false, "Etcd part"
+	}
+	return true, ""
+}
+
+// Modal creates small window in UI.
 func (g *Gui) Modal(p tview.Primitive, width, height int) tview.Primitive {
 	return tview.NewGrid().
 		SetColumns(0, width, 0).

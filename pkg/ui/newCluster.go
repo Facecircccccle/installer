@@ -7,7 +7,7 @@ import (
 )
 
 // ProcessNewCluster sends commands to the remote host to complete the installation process.
-func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *myText) {
 	processAnsibleHosts(g, s, ansibleLog)
 
 	copyScript(g, ansibleLog)
@@ -21,10 +21,10 @@ func ProcessNewCluster(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	processSendPackage(g, ansibleLog)
 	processInstall(g, s, ansibleLog)
 
-	deleteTmpScript(g, ansibleLog)
+	deleteTmpScript(g, s, ansibleLog)
 }
 
-func processInstall(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+func processInstall(g *Gui, s *setup.Setup, ansibleLog *myText) {
 	if s.MasterCount > 1 {
 		for i := 0; i < s.MasterCount; i++ {
 			_ = g.Command("sh localScript/add_ansible_host.sh "+"netCardChange "+s.Masters[i].IPAddr, ansibleLog)
@@ -37,24 +37,19 @@ func processInstall(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	}
 }
 
-func processSendPackage(g *Gui, ansibleLog *MyText) {
+func processSendPackage(g *Gui, ansibleLog *myText) {
 	_ = g.Command("sh start.sh ", ansibleLog)
 }
 
-func processTARScript(g *Gui, ansibleLog *MyText) {
+func processTARScript(g *Gui, ansibleLog *myText) {
 	_ = g.Command("tar -zcvf k8s-installer.tar.gz k8s-installer", ansibleLog)
 }
 
-func processPermission(g *Gui, ansibleLog *MyText) {
+func processPermission(g *Gui, ansibleLog *myText) {
 	_ = g.Command("chmod -R +x .", ansibleLog)
 }
 
-func deleteTmpScript(g *Gui, ansibleLog *MyText) {
-	_ = g.Command("rm -rf k8s-installer.tar.gz", ansibleLog)
-	_ = g.Command("rm -rf k8s-installer", ansibleLog)
-}
-
-func processHAScript(g *Gui, s *setup.Setup, ansibleLog *MyText) {
+func processHAScript(g *Gui, s *setup.Setup, ansibleLog *myText) {
 	if s.MasterCount > 1 {
 		_ = g.Command("sed -i 's/VIRTUAL_IP/"+s.Kubernetes.VirtualIP+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
 		_ = g.Command("sed -i 's/CERT_SANS/"+s.Kubernetes.CertSANs+"/g' k8s-installer/addFirstMaster/HaMasterPreSet.yaml", ansibleLog)
@@ -196,17 +191,17 @@ func inputControllerManager(s1 *string, s *setup.Setup) {
 	}
 }
 
-func copyScript(g *Gui, ansibleLog *MyText) {
+func copyScript(g *Gui, ansibleLog *myText) {
 	_ = g.Command("cp -r k8s-installer-fix k8s-installer", ansibleLog)
 	ansibleLog.SetText(ansibleLog.GetText(false) + "Making new script...").ScrollToEnd()
 	ansibleLog.SetText(ansibleLog.GetText(false) + "Copy from template...").ScrollToEnd()
 	g.App.ForceDraw()
 }
 
-func processAnsibleHosts(g *Gui, s *setup.Setup, ansibleLog *MyText) {
-	_ = g.Command("rm -rf /etc/ansible/hosts", ansibleLog)
+func processAnsibleHosts(g *Gui, s *setup.Setup, ansibleLog *myText) {
+	//	_ = g.Command("rm -rf /etc/ansible/hosts", ansibleLog)
 	for i := 0; i < s.MasterCount; i++ {
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Masters[i].IPAddr, ansibleLog)
+		//	_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Masters[i].IPAddr, ansibleLog)
 		_ = g.Command("sed -i 's/"+s.Masters[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
 		if i == 0 {
 			_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-init "+"master1 ansible_host="+s.Masters[i].IPAddr, ansibleLog)
@@ -216,7 +211,7 @@ func processAnsibleHosts(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	}
 
 	for i := 0; i < s.NodeCount; i++ {
-		_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Nodes[i].IPAddr, ansibleLog)
+		//	_ = g.Command("sh localScript/add_ansible_host.sh "+"hostname "+s.Nodes[i].IPAddr, ansibleLog)
 		_ = g.Command("sed -i 's/"+s.Nodes[i].IPAddr+"//g' /etc/ansible/hosts", ansibleLog)
 		_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-node "+s.Nodes[i].IPAddr, ansibleLog)
 	}
@@ -227,4 +222,25 @@ func processAnsibleHosts(g *Gui, s *setup.Setup, ansibleLog *MyText) {
 	}
 	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-master", ansibleLog)
 	_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-node", ansibleLog)
+}
+
+func deleteTmpScript(g *Gui, s *setup.Setup, ansibleLog *myText) {
+	_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master-init", ansibleLog)
+	for i := 0; i < s.NodeCount; i++ {
+		_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-node", ansibleLog)
+	}
+
+	_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master:children", ansibleLog)
+	if s.MasterCount > 1 {
+		for i := 0; i < s.MasterCount-1; i++ {
+			_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master-other", ansibleLog)
+		}
+		_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master:children", ansibleLog)
+	}
+
+	_ = g.Command("sh localScript/delete_ansible_host.sh "+"allnodes:children", ansibleLog)
+	_ = g.Command("sh localScript/delete_ansible_host.sh "+"allnodes:children", ansibleLog)
+
+	_ = g.Command("rm -rf k8s-installer.tar.gz", ansibleLog)
+	_ = g.Command("rm -rf k8s-installer", ansibleLog)
 }

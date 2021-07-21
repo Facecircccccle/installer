@@ -1,5 +1,6 @@
 package version
 
+// ComponentVersion struct.
 type ComponentVersion struct {
 	DockerVersion  []string
 	EtcdVersion    []string
@@ -46,6 +47,7 @@ var version = map[string]ComponentVersion{
 	},
 }
 
+// GetComponentVersion get the version map.
 func GetComponentVersion() map[string]ComponentVersion {
 	return version
 }

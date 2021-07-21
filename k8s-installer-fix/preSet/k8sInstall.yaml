@@ -5,7 +5,14 @@
       shell: /root/k8s-installer/k8s-script/cluster/reset_k8s_master.sh
     - name: pull k8s images
       shell: /root/k8s-installer/k8s-script/cluster/pull_k8s_image.sh
-      retries: 2
+      register: image_result
+      until: image_result is succeeded
+      retries: 3
+      delay: 5
     - name: install k8s
       shell: /root/k8s-installer/k8s-script/osinit/installk8s.sh
+      register: k8s_result
+      until: k8s_result is succeeded
+      retries: 3
+      delay: 5
 

@@ -1,5 +1,6 @@
 package setup
 
+// Setup struct.
 type Setup struct {
 	MasterCount int
 	NodeCount   int
@@ -14,6 +15,7 @@ type Setup struct {
 	Kubernetes KubernetesSetup
 }
 
+// Master struct.
 type Master struct {
 	IPAddr  string
 	NetCard string
@@ -22,6 +24,7 @@ type Master struct {
 	//code string
 }
 
+// Node struct.
 type Node struct {
 	IPAddr string
 	//Name     string
@@ -30,6 +33,7 @@ type Node struct {
 	Allocate NodeAllocate
 }
 
+// Access struct.
 type Access struct {
 	IPAddr string
 	//Name string
@@ -37,17 +41,20 @@ type Access struct {
 	//code string
 }
 
+// DockerSetup struct.
 type DockerSetup struct {
 	RepositoryName string
 	RepositoryIP   string
 	Version        string
 }
 
+// EtcdSetup struct.
 type EtcdSetup struct {
 	Version string
 	DataDir string
 }
 
+// FeatureGates struct.
 type FeatureGates struct {
 	AllowExtTrafficLocalEndpoints   bool
 	DynamicVolumeProvisioning       bool
@@ -114,6 +121,7 @@ type FeatureGates struct {
 	ServiceNodeExclusion          bool
 }
 
+// KubernetesSetup struct.
 type KubernetesSetup struct {
 	ClusterName           string
 	ControllerManagerAddr string //0.0.0.0
@@ -130,17 +138,20 @@ type KubernetesSetup struct {
 	FeatureGates          FeatureGates
 }
 
+// KubeNetwork struct.
 type KubeNetwork struct {
 	PodSubnet     string //10.244.0.0/16
 	ServiceSubnet string //10.96.0.0/12
 	DNSdomain     string
 }
 
+// NetComponentSetup struct.
 type NetComponentSetup struct {
 	Component string
 	Version   string
 }
 
+// AdmissionPlugin struct.
 type AdmissionPlugin struct {
 	NamespaceLifecycle         bool
 	LimitRanger                bool
@@ -152,6 +163,7 @@ type AdmissionPlugin struct {
 	ResourceQuota              bool
 }
 
+// NodeAllocate struct.
 type NodeAllocate struct {
 	KubeReservedCPU string
 	SysReservedCPU  string
@@ -163,6 +175,7 @@ type NodeAllocate struct {
 	EvictionNodefs  string //10%
 }
 
+// NewSampleNodeAllocate create NodeAllocate structure.
 func NewSampleNodeAllocate() NodeAllocate {
 	return NodeAllocate{
 		KubeReservedCPU: "1",
@@ -175,6 +188,8 @@ func NewSampleNodeAllocate() NodeAllocate {
 		EvictionNodefs:  "10%",
 	}
 }
+
+// NewSampleSetupStructure create Setup structure.
 func NewSampleSetupStructure() *Setup {
 
 	Netcomponentsetup := &NetComponentSetup{

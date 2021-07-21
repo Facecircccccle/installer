@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 )
 
-func Newlist(s string) *tview.List {
+func newlist(s string) *tview.List {
 	list := tview.NewList().AddItem(s, "", '>', nil)
 	list.SetShortcutColor(tcell.ColorYellow)
 	//list.SetMainTextColor(tcell.ColorBlack)
@@ -22,10 +22,11 @@ func Newlist(s string) *tview.List {
 	return list
 }
 
+// Welcome build the main window UI.
 func (g *Gui) Welcome() {
-	listSetup := Newlist("cluster Setup")
-	listManage := Newlist("cluster management")
-	listExit := Newlist("exit")
+	listSetup := newlist("cluster Setup")
+	listManage := newlist("cluster management")
+	listExit := newlist("exit")
 
 	grid := tview.NewGrid().SetRows(-5, -5, -1, -5, -1, -5, -1, -5).SetColumns(-6, -1, -3, -6, -6).
 		AddItem(tview.NewTextView().SetText(constants.EbKubernetes), 1, 1, 1, 3, 1, 1, false).
@@ -50,7 +51,7 @@ func (g *Gui) Welcome() {
 	listManage.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch key := event.Key(); key {
 		case tcell.KeyEnter:
-			g.ImportClusterForm(listManage)
+			g.importClusterForm(listManage)
 		case tcell.KeyTAB, tcell.KeyDown:
 			g.App.SetFocus(listExit)
 		case tcell.KeyUp:
@@ -76,7 +77,7 @@ func (g *Gui) Welcome() {
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
-func (g *Gui) ImportClusterForm(l *tview.List) {
+func (g *Gui) importClusterForm(l *tview.List) {
 
 	form := tview.NewForm()
 	form.SetBorder(true)
@@ -89,7 +90,7 @@ func (g *Gui) ImportClusterForm(l *tview.List) {
 		//	AddInputField("Config addr", "", inputWidth, nil, nil).
 		AddButton("Load", func() {
 			if form.GetFormItemByLabel("config file is already in ~/.kube/config").(*tview.Checkbox).IsChecked() {
-				result, reason, clientset := ConfigCheck()
+				result, reason, clientset := configCheck()
 				if result {
 					Manage(g, clientset)
 
@@ -106,7 +107,7 @@ func (g *Gui) ImportClusterForm(l *tview.List) {
 							g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 70, 10), true).ShowPage("Welcome")
 						}
 					})
-					g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("Welcome")
+					g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 10), true).ShowPage("Welcome")
 				}
 			} else {
 				modal := tview.NewModal().
@@ -119,35 +120,35 @@ func (g *Gui) ImportClusterForm(l *tview.List) {
 						g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 70, 10), true).ShowPage("Welcome")
 					}
 				})
-				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 16), true).ShowPage("Welcome")
+				g.Pages.AddAndSwitchToPage("Modal", g.Modal(modal, 40, 10), true).ShowPage("Welcome")
 			}
 
-		}).
+		}).SetButtonsAlign(tview.AlignRight).
 		AddButton("Cancel", func() {
 			g.Pages.RemovePage("newClusterForm")
 			g.App.SetFocus(l)
-		})
+		}).SetButtonsAlign(tview.AlignRight)
 
-	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 16), true).ShowPage("Welcome")
+	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 10), true).ShowPage("Welcome")
 }
 
-var Kubeconfig *string
+var kubeconfig *string
 
-func ConfigCheck() (bool, string, *kubernetes.Clientset) {
+func configCheck() (bool, string, *kubernetes.Clientset) {
 	var kubeconfig *string
 	var clientset *kubernetes.Clientset
 
-	if Kubeconfig == nil {
+	if kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
 			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 		} else {
 			kubeconfig = flag.String("kubeconfig", "", "config")
 		}
 		flag.Parse()
-		Kubeconfig = kubeconfig
+		kubeconfig = kubeconfig
 	}
 
-	config, err := clientcmd.BuildConfigFromFlags("", *Kubeconfig)
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		return false, "build config error, check input file path", nil
 	}

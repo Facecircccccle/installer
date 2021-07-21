@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"installer/pkg/util"
 	"io"
 	"os"
 	"os/exec"
@@ -13,21 +12,21 @@ import (
 	"sync"
 )
 
-type MyGrid struct {
+type myGrid struct {
 	*tview.Grid
 }
 
-type MyTable struct {
+type myTable struct {
 	*tview.Table
 }
 
-type MyText struct {
+type myText struct {
 	*tview.TextView
 }
 
-func (g *Gui) Command(cmd string, log *MyText) error {
-	//c := exec.Command("cmd", "/C", cmd) 	// windows
-	c := exec.Command("bash", "-c", cmd) // mac or linux
+// Command processes shell command and output result in UI.
+func (g *Gui) Command(cmd string, log *myText) error {
+	c := exec.Command("bash", "-c", cmd)
 	stdout, err := c.StdoutPipe()
 	if err != nil {
 		return err
@@ -45,7 +44,6 @@ func (g *Gui) Command(cmd string, log *MyText) error {
 			if readString == "\n" {
 				continue
 			}
-			util.ExecShell("echo \"" + readString + "\" >> loggg")
 			log.SetText(log.GetText(false) + readString)
 			log.ScrollToEnd()
 			g.App.ForceDraw()
@@ -56,6 +54,7 @@ func (g *Gui) Command(cmd string, log *MyText) error {
 	return err
 }
 
+// NewTableFromFile create table UI from the formatted text.
 func (g *Gui) NewTableFromFile(s string) {
 	table := tview.NewTable()
 	f, err := os.Open(s)

@@ -7,16 +7,11 @@ import (
 	"installer/pkg/setup"
 )
 
-type SetupLog struct {
-	app   *tview.Application
-	pages *tview.Pages
-}
+func (g *Gui) setupLog(s *setup.Setup) {
 
-func (g *Gui) SetupLog(s *setup.Setup) {
-
-	setupInfo := NewSetupInfo(g)
-	setupMenu := NewSetupMenu(g)
-	setupAnsibleHostAndName := NewAnsibleHostAndName(g, setupMenu, s, setupInfo)
+	setupInfo := newSetupInfo(g)
+	setupMenu := newSetupMenu(g)
+	setupAnsibleHostAndName := newAnsibleHostAndName(g, setupMenu, s, setupInfo)
 
 	gridSetupLog := tview.NewGrid().SetRows(10, -1).SetColumns(-1, -5).
 		AddItem(setupInfo, 0, 0, 1, 2, 0, 0, false).
@@ -31,6 +26,10 @@ func (g *Gui) SetupLog(s *setup.Setup) {
 			g.App.SetFocus(setupAnsibleHostAndName)
 
 		case 1:
+			ROLE_SET = false
+			RUNTIME_SET = false
+			KUBE_SET = false
+			STORAGE_SET = false
 			g.Pages.RemovePage("SetupLog")
 			g.SetupChoice()
 		}
@@ -42,7 +41,7 @@ func (g *Gui) SetupLog(s *setup.Setup) {
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
-func NewSetupInfo(g *Gui) *Infos {
+func newSetupInfo(g *Gui) *Infos {
 	infos := &Infos{
 		TextView: tview.NewTextView().SetText("").SetWordWrap(true).SetWrap(true),
 	}
@@ -51,7 +50,7 @@ func NewSetupInfo(g *Gui) *Infos {
 	return infos
 }
 
-func NewSetupMenu(g *Gui) *menu.Menus {
+func newSetupMenu(g *Gui) *menu.Menus {
 	menus := &menu.Menus{
 		Table: tview.NewTable().SetSelectable(true, true).SetFixed(1, 1),
 	}
@@ -72,7 +71,7 @@ func NewSetupMenu(g *Gui) *menu.Menus {
 	return menus
 }
 
-func (ansibleName *MyText) SetKeybinding(g *Gui, setupMenu *menu.Menus) {
+func (ansibleName *myText) setKeybinding(g *Gui, setupMenu *menu.Menus) {
 	ansibleName.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'b':
@@ -81,8 +80,8 @@ func (ansibleName *MyText) SetKeybinding(g *Gui, setupMenu *menu.Menus) {
 		return event
 	})
 }
-func NewAnsibleHostAndName(g *Gui, setupMenu *menu.Menus, setup *setup.Setup, setupInfo *Infos) *MyText {
-	ansibleHost := &MyText{
+func newAnsibleHostAndName(g *Gui, setupMenu *menu.Menus, setup *setup.Setup, setupInfo *Infos) *myText {
+	ansibleHost := &myText{
 		TextView: tview.NewTextView().SetWordWrap(true).SetWrap(true),
 	}
 
@@ -91,7 +90,7 @@ func NewAnsibleHostAndName(g *Gui, setupMenu *menu.Menus, setup *setup.Setup, se
 	ansibleHost.SetTitle("Ansible Log").SetTitleAlign(tview.AlignCenter)
 	ansibleHost.SetBorder(true)
 	ansibleHost.SetScrollable(true)
-	ansibleHost.SetKeybinding(g, setupMenu)
+	ansibleHost.setKeybinding(g, setupMenu)
 
 	return ansibleHost
 }

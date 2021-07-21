@@ -1,5 +1,6 @@
 package constants
 
+// constants set.
 const (
 	ClusterPort         = string("6443")
 	HaPort              = string("16443")
@@ -9,12 +10,16 @@ const (
 	NodeLabelRole       = "kubernetes.io/role"
 )
 
+// Supported versions.
 var (
 	KubernetesVersion = []string{"v1.20.1", "v1.20.2", "v1.20.3", "v1.20.4", "v1.20.5", "v1.20.6"}
 
 	DockerVersion = []string{"docker-ce-19.03.15"}
 	EtcdVersion   = []string{"3.4.13-0"}
+)
 
+// Hints and tips
+var (
 	HowToSetup = "The installation section currently provides two modes: ONE master cluster installation and MULTI master (HA) cluster installation."
 
 	OneMasterSetup = "This section installs a single master kubernetes cluster on your remote machine, and you can enter the configuration information for the cluster as needed."
@@ -62,5 +67,8 @@ var (
 		"For PERCENT part, please make sure the input should end with '%'.\n" +
 		"\nKEY: Use 'TAB' to scroll down, Enter 'next' to the Setup Menu."
 
-	SetupListFeatureIntro = "Feature info"
+	SetupListFeatureIntro = "Feature Gates is a feature in Kubernetes that can be used to turn functionality on or off at the node, " +
+		"cluster, or platform level. This feature allows users to safely test functionality without worrying about the risks to critical " +
+		"components or production environments.\n " +
+		"\nKEY: We strongly recommend that you do NOT modify this area unless you are fully aware of its functionality and what you are doing."
 )

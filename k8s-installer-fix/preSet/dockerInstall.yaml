@@ -3,4 +3,7 @@
   tasks:
     - name: Install docker
       shell: /root/k8s-installer/k8s-script/osinit/installdocker.sh
-      retries: 2
+      register: docker_result
+      until: docker_result is succeeded
+      retries: 3
+      delay: 5
