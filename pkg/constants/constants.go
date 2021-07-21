@@ -8,6 +8,14 @@ const (
 	InputWidth          = 70
 	LabelNodeRolePrefix = "node-role.kubernetes.io/"
 	NodeLabelRole       = "kubernetes.io/role"
+
+	// IsDefaultStorageClassAnnotation represents a StorageClass annotation that
+	// marks a class as the default StorageClass
+	IsDefaultStorageClassAnnotation = "storageclass.kubernetes.io/is-default-class"
+
+	// BetaIsDefaultStorageClassAnnotation is the beta version of IsDefaultStorageClassAnnotation.
+	// TODO: remove Beta when no longer used
+	BetaIsDefaultStorageClassAnnotation = "storageclass.beta.kubernetes.io/is-default-class"
 )
 
 // Supported versions.

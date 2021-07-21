@@ -26,19 +26,29 @@ type NodeOutputStructure struct {
 }
 
 type PVOutputStructure struct {
-
+	Name          string
+	Capacity      string
+	AccessModes   string
+	ReclaimPolicy string
+	Status        string
+	Claim         string
+	StorageClass  string
+	Reason        string
+	Age           string
 }
 
 type NamespaceOutPutStructure struct {
-
+	Name   string
+	Status string
+	Age    string
 }
 
 type SCOutPutStructure struct {
-
-}
-
-type RoleOutPutStructure struct {
-
+	Name                 string
+	Provisioner          string
+	ReclaimPolicy        string
+	VolumeBindingMode    string
+	AllowVolumeExpansion string
 }
 
 // GetNodeInternalIP
@@ -89,7 +99,7 @@ func FormatDockerVersion(version string) string {
 	return buffer.String()[0 : len(buffer.String())-1]
 }
 
-// TranslateTimestampSince.
+// TranslateTimestampSince returns the elapsed time since timestamp in human-readable approximation.
 func TranslateTimestampSince(timestamp metav1.Time) string {
 	if timestamp.IsZero() {
 		return "<unknown>"
@@ -113,4 +123,51 @@ func FindNodeRoles(node *v1.Node) []string {
 		}
 	}
 	return roles.List()
+}
+
+// GetAccessModesAsString returns a string representation of an array of access modes.
+// modes, when present, are always in the same order: RWO,ROX,RWX.
+func GetAccessModesAsString(modes []v1.PersistentVolumeAccessMode) string {
+	modes = removeDuplicateAccessModes(modes)
+	var modesStr []string
+	if containsAccessMode(modes, v1.ReadWriteOnce) {
+		modesStr = append(modesStr, "RWO")
+	}
+	if containsAccessMode(modes, v1.ReadOnlyMany) {
+		modesStr = append(modesStr, "ROX")
+	}
+	if containsAccessMode(modes, v1.ReadWriteMany) {
+		modesStr = append(modesStr, "RWX")
+	}
+	return strings.Join(modesStr, ",")
+}
+
+// GetPersistentVolumeClass returns StorageClassName.
+func GetPersistentVolumeClass(volume *v1.PersistentVolume) string {
+	// Use beta annotation first
+	if class, found := volume.Annotations[v1.BetaStorageClassAnnotation]; found {
+		return class
+	}
+
+	return volume.Spec.StorageClassName
+}
+
+// removeDuplicateAccessModes returns an array of access modes without any duplicates
+func removeDuplicateAccessModes(modes []v1.PersistentVolumeAccessMode) []v1.PersistentVolumeAccessMode {
+	var accessModes []v1.PersistentVolumeAccessMode
+	for _, m := range modes {
+		if !containsAccessMode(accessModes, m) {
+			accessModes = append(accessModes, m)
+		}
+	}
+	return accessModes
+}
+
+func containsAccessMode(modes []v1.PersistentVolumeAccessMode, mode v1.PersistentVolumeAccessMode) bool {
+	for _, m := range modes {
+		if m == mode {
+			return true
+		}
+	}
+	return false
 }

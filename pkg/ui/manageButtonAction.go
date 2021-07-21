@@ -4,11 +4,13 @@ import (
 	"context"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"installer/pkg/constants"
 	"installer/pkg/manage"
 	"installer/pkg/menu"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"strconv"
 	"strings"
 )
 
@@ -27,7 +29,54 @@ func setNodeKeybinding(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *m
 		}
 		return event
 	})
+}
 
+func setNamespaceKeybinding(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
+	r.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		//g.setGlobalKeybinding(event)
+		switch event.Key() {
+		case tcell.KeyTAB:
+			g.App.SetFocus(log)
+		}
+		switch event.Rune() {
+
+		case 'b':
+			g.App.SetFocus(m)
+		}
+		return event
+	})
+}
+
+func setStorageClassKeybinding(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
+	r.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		//g.setGlobalKeybinding(event)
+		switch event.Key() {
+		case tcell.KeyTAB:
+			g.App.SetFocus(log)
+		}
+		switch event.Rune() {
+
+		case 'b':
+			g.App.SetFocus(m)
+		}
+		return event
+	})
+}
+
+func setPVKeybinding(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
+	r.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		//g.setGlobalKeybinding(event)
+		switch event.Key() {
+		case tcell.KeyTAB:
+			g.App.SetFocus(log)
+		}
+		switch event.Rune() {
+
+		case 'b':
+			g.App.SetFocus(m)
+		}
+		return event
+	})
 }
 
 func setNodeEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
@@ -112,6 +161,238 @@ func setNodeEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Info
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 
 		table.SetCell(i+2, 4, tview.NewTableCell(nodeInfo[i].Version).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+	}
+}
+
+func setStorageClassEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
+	table := r.Clear()
+
+	headers := []string{
+		"Name",
+		"Provisioner",
+		"ReclaimPolicy",
+		"VolumeBindingMode",
+		"AllowVolumeExpansion",
+	}
+
+	for i, header := range headers {
+		table.SetCell(0, i, &tview.TableCell{
+			Text:            header,
+			NotSelectable:   true,
+			Align:           tview.AlignLeft,
+			Color:           tcell.ColorWhite,
+			BackgroundColor: tcell.ColorDefault,
+			Attributes:      tcell.AttrBold,
+		})
+	}
+
+	sc, err := clientset.StorageV1().StorageClasses().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	var storageClassInfo []manage.SCOutPutStructure
+	for i := 0; i < len(sc.Items); i++ {
+		obj := sc.Items[i]
+
+		name := obj.Name
+		if IsDefaultAnnotation(obj.ObjectMeta) {
+			name += " (default)"
+		}
+		provtype := obj.Provisioner
+		reclaimPolicy := "delete"
+		if obj.ReclaimPolicy != nil {
+			reclaimPolicy = string(*obj.ReclaimPolicy)
+		}
+
+		volumeBindingMode := "Immediate"
+		if obj.VolumeBindingMode != nil {
+			volumeBindingMode = string(*obj.VolumeBindingMode)
+		}
+
+		allowVolumeExpansion := false
+		if obj.AllowVolumeExpansion != nil {
+			allowVolumeExpansion = *obj.AllowVolumeExpansion
+		}
+
+		storageClassInfo = append(storageClassInfo, manage.SCOutPutStructure{
+			Name:                 name,
+			Provisioner:          provtype,
+			ReclaimPolicy:        reclaimPolicy,
+			VolumeBindingMode:    volumeBindingMode,
+			AllowVolumeExpansion: strconv.FormatBool(allowVolumeExpansion),
+		})
+	}
+
+	for i := 0; i < len(storageClassInfo); i++ {
+		table.SetCell(i+2, 0, tview.NewTableCell(storageClassInfo[i].Name).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 1, tview.NewTableCell(storageClassInfo[i].Provisioner).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 2, tview.NewTableCell(storageClassInfo[i].ReclaimPolicy).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 3, tview.NewTableCell(storageClassInfo[i].VolumeBindingMode).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 4, tview.NewTableCell(storageClassInfo[i].AllowVolumeExpansion).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+	}
+}
+
+func IsDefaultAnnotation(obj metav1.ObjectMeta) bool {
+	if obj.Annotations[constants.IsDefaultStorageClassAnnotation] == "true" {
+		return true
+	}
+	if obj.Annotations[constants.BetaIsDefaultStorageClassAnnotation] == "true" {
+		return true
+	}
+
+	return false
+}
+
+func setNamespaceEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
+	table := r.Clear()
+	headers := []string{
+		"Name",
+		"Status",
+		"Age",
+	}
+
+	for i, header := range headers {
+		table.SetCell(0, i, &tview.TableCell{
+			Text:            header,
+			NotSelectable:   true,
+			Align:           tview.AlignLeft,
+			Color:           tcell.ColorWhite,
+			BackgroundColor: tcell.ColorDefault,
+			Attributes:      tcell.AttrBold,
+		})
+	}
+
+	namespaceList, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	var namespaceInfo []manage.NamespaceOutPutStructure
+	for i := 0; i < len(namespaceList.Items); i++ {
+		obj := namespaceList.Items[i]
+
+		namespaceInfo = append(namespaceInfo, manage.NamespaceOutPutStructure{
+			Name:   obj.Name,
+			Status: string(obj.Status.Phase),
+			Age:    manage.TranslateTimestampSince(obj.CreationTimestamp),
+		})
+	}
+
+	for i := 0; i < len(namespaceInfo); i++ {
+		table.SetCell(i+2, 0, tview.NewTableCell(namespaceInfo[i].Name).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 1, tview.NewTableCell(namespaceInfo[i].Status).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 2, tview.NewTableCell(namespaceInfo[i].Age).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+	}
+}
+
+func setPVEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
+	table := r.Clear()
+
+	headers := []string{
+		"Name",
+		"Capacity",
+		"AccessModes",
+		"ReclaimPolicy",
+		"Status",
+		"Claim",
+		"StorageClass",
+		"Reason",
+		"Age",
+	}
+
+	for i, header := range headers {
+		table.SetCell(0, i, &tview.TableCell{
+			Text:            header,
+			NotSelectable:   true,
+			Align:           tview.AlignLeft,
+			Color:           tcell.ColorWhite,
+			BackgroundColor: tcell.ColorDefault,
+			Attributes:      tcell.AttrBold,
+		})
+	}
+
+	persistentVolumeList, err := clientset.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	var pv []manage.PVOutputStructure
+	for i := 0; i < len(persistentVolumeList.Items); i++ {
+		obj := persistentVolumeList.Items[i]
+
+		claimRefUID := ""
+		if obj.Spec.ClaimRef != nil {
+			claimRefUID += obj.Spec.ClaimRef.Namespace
+			claimRefUID += "/"
+			claimRefUID += obj.Spec.ClaimRef.Name
+		}
+
+		modesStr := manage.GetAccessModesAsString(obj.Spec.AccessModes)
+		reclaimPolicyStr := string(obj.Spec.PersistentVolumeReclaimPolicy)
+
+		aQty := obj.Spec.Capacity["storage"]
+		aSize := aQty.String()
+
+		phase := obj.Status.Phase
+		if obj.ObjectMeta.DeletionTimestamp != nil {
+			phase = "Terminating"
+		}
+
+		pv = append(pv, manage.PVOutputStructure{
+			Name:          obj.Name,
+			Capacity:      aSize,
+			AccessModes:   modesStr,
+			ReclaimPolicy: reclaimPolicyStr,
+			Status:        string(phase),
+			Claim:        claimRefUID,
+			StorageClass: manage.GetPersistentVolumeClass(&obj),
+			Reason:       obj.Status.Reason,
+			Age:          manage.TranslateTimestampSince(obj.CreationTimestamp),
+		})
+	}
+
+	for i := 0; i < len(pv); i++ {
+		table.SetCell(i+2, 0, tview.NewTableCell(pv[i].Name).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 1, tview.NewTableCell(pv[i].Capacity).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 2, tview.NewTableCell(pv[i].AccessModes).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 3, tview.NewTableCell(pv[i].ReclaimPolicy).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 4, tview.NewTableCell(pv[i].Status).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 5, tview.NewTableCell(pv[i].Claim).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 6, tview.NewTableCell(pv[i].StorageClass).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 7, tview.NewTableCell(pv[i].Reason).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 8, tview.NewTableCell(pv[i].Age).
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 	}
 }
