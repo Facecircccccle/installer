@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"installer/pkg/version"
+	"math"
 	"os"
 	"os/exec"
 	"regexp"
@@ -99,6 +100,25 @@ func ExecShell(s string) string {
 
 	return out.String()
 }
+
+// Builds a one-line meter using the amount and total values limited to the given width
+func BuildAsciiMeterCurrentTotal(portion int64, total int64, width int) string {
+	const fullChar = "█"
+	const emptyChar = "▒"
+
+	full := 0
+	if total > 0 {
+		ratio := float64(portion) / float64(total)
+		ratio = math.Max(0, math.Min(1.0, ratio))
+		full = int(math.Round(ratio * float64(width)))
+	}
+
+	return strings.Join([]string{
+		strings.Repeat(fullChar, full),
+		strings.Repeat(emptyChar, width-full),
+	}, "")
+}
+
 
 // StringIsInArray check whether a string array contains a string.
 func StringIsInArray(target string, strArray []string) bool {

@@ -43,6 +43,14 @@ type NamespaceOutPutStructure struct {
 	Age    string
 }
 
+type NodeStatusOutPutStructure struct {
+	Name string
+	CPU string
+	CPUPer string
+	MEMORY string
+	MEMORYPer string
+}
+
 type SCOutPutStructure struct {
 	Name                 string
 	Provisioner          string

@@ -24,6 +24,13 @@ type myText struct {
 	*tview.TextView
 }
 
+
+
+
+
+
+
+
 // Command processes shell command and output result in UI.
 func (g *Gui) Command(cmd string, log *myText) error {
 	c := exec.Command("bash", "-c", cmd)

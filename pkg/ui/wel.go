@@ -132,23 +132,23 @@ func (g *Gui) importClusterForm(l *tview.List) {
 	g.Pages.AddAndSwitchToPage("newClusterForm", g.Modal(form, 80, 10), true).ShowPage("Welcome")
 }
 
-var kubeconfig *string
+var Kubeconfig *string
 
 func configCheck() (bool, string, *kubernetes.Clientset) {
 	var kubeconfig *string
 	var clientset *kubernetes.Clientset
 
-	if kubeconfig == nil {
+	if Kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
 			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 		} else {
 			kubeconfig = flag.String("kubeconfig", "", "config")
 		}
 		flag.Parse()
-		kubeconfig = kubeconfig
+		Kubeconfig = kubeconfig
 	}
 
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := clientcmd.BuildConfigFromFlags("", *Kubeconfig)
 	if err != nil {
 		return false, "build config error, check input file path", nil
 	}

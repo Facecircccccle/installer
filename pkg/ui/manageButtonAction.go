@@ -7,6 +7,8 @@ import (
 	"installer/pkg/constants"
 	"installer/pkg/manage"
 	"installer/pkg/menu"
+	setup2 "installer/pkg/setup"
+	"installer/pkg/util"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -254,6 +256,60 @@ func IsDefaultAnnotation(obj metav1.ObjectMeta) bool {
 	return false
 }
 
+
+func setNodeStatusKeybinding(g *Gui, table *myTable, clientset *kubernetes.Clientset, m *menu.Menus, info *Infos) {
+
+}
+
+func setNodeStatusEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, info *Infos) {
+	table := r.Clear()
+	headers := []string{
+		"Name",
+		"CPU(cores)",
+		"CPU%",
+		"MEMORY(bytes)",
+		"MEMORY%",
+	}
+
+	for i, header := range headers {
+		table.SetCell(0, i, &tview.TableCell{
+			Text:            header,
+			NotSelectable:   true,
+			Align:           tview.AlignLeft,
+			Color:           tcell.ColorWhite,
+			BackgroundColor: tcell.ColorDefault,
+			Attributes:      tcell.AttrBold,
+		})
+	}
+
+	namespaceList, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	var namespaceInfo []manage.NamespaceOutPutStructure
+	for i := 0; i < len(namespaceList.Items); i++ {
+		obj := namespaceList.Items[i]
+
+		namespaceInfo = append(namespaceInfo, manage.NamespaceOutPutStructure{
+			Name:   obj.Name,
+			Status: string(obj.Status.Phase),
+			Age:    manage.TranslateTimestampSince(obj.CreationTimestamp),
+		})
+	}
+
+	for i := 0; i < len(namespaceInfo); i++ {
+		table.SetCell(i+2, 0, tview.NewTableCell(namespaceInfo[i].Name).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 1, tview.NewTableCell(namespaceInfo[i].Status).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+
+		table.SetCell(i+2, 2, tview.NewTableCell(namespaceInfo[i].Age).
+			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
+	}
+}
+
 func setNamespaceEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos, log *myText) {
 	table := r.Clear()
 	headers := []string{
@@ -395,4 +451,113 @@ func setPVEntries(g *Gui, r *myTable, clientset *kubernetes.Clientset, i *Infos,
 		table.SetCell(i+2, 8, tview.NewTableCell(pv[i].Age).
 			SetTextColor(tcell.ColorLightYellow).SetMaxWidth(1).SetExpansion(1))
 	}
+}
+
+func importNodeForm(g *Gui, r *myTable, clientset *kubernetes.Clientset, m *menu.Menus, i *Infos, log *myText) {
+	form := tview.NewForm()
+	form.SetBorder(true)
+	form.SetTitleAlign(tview.AlignCenter)
+	form.SetTitle("Import Node")
+	form.AddInputField("IP", "", constants.InputWidth, nil, nil).
+		AddInputField("docker-registries", "", constants.InputWidth, nil, nil).
+		AddButton("Load", func() {
+			nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+			if err != nil {
+				panic(err)
+			}
+			masterCount := 0
+			isHA := false
+
+			for i := 0; i < len(nodes.Items); i++ {
+				if strings.Contains(strings.Join(manage.FindNodeRoles(&nodes.Items[i]), ","), "master") {
+					masterCount++
+				}
+			}
+			if masterCount > 1{
+				isHA = true
+			}
+
+			result, reason := setup2.AddRoleCheck(form, isHA)
+			if result == true {
+				nodeIP := form.GetFormItemByLabel("IP").(*tview.InputField).GetText()
+				dockerRegistries := form.GetFormItemByLabel("docker-registries").(*tview.InputField).GetText()
+
+				//获取k8s docker版本, 仓库, masterip
+				kubeVersion, containerRuntimeVersion, masterIP := manage.GetKubeInfo(clientset)
+				if dockerRegistries == "" {
+					dockerRegistries = "0.0.0.0/0"
+				}
+
+				//删除当前的ansible-host, 添加[node] 192.168.48.1
+				//_ = g.Command("rm -rf /etc/ansible/hosts", log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-node "+nodeIP, log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master-init "+masterIP, log)
+				//_ = g.Command("sh localScript/add_ansible_host.sh "+"k8s-master:children "+"k8s-master-init", log)
+				//_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-master", log)
+				_ = g.Command("sh localScript/add_ansible_host.sh "+"allnodes:children "+"k8s-node", log)
+
+
+				//在192.168.48.1上创建满足preset的节点
+				_ = g.Command("cp -r k8s-installer-fix k8s-installer", log)
+
+				//k8s
+				_ = g.Command("sed -i 's/KUBEADM_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+				_ = g.Command("sed -i 's/KUBELET_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+				_ = g.Command("sed -i 's/KUBECTL_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/osinit/installk8s.sh", log)
+
+				_ = g.Command("sed -i 's/KUBE_APISERVER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_PROXY_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_SCHEDULER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/KUBE_CONTROLLER_VERSION/"+kubeVersion+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/ETCD_VERSION/"+util.GetEtcdVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/COREDNS_VERSION/"+util.GetCoreDNSVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+				_ = g.Command("sed -i 's/PAUSE_VERSION/"+util.GetPauseVersion(kubeVersion)+"/g' k8s-installer/k8s-script/cluster/pull_k8s_image.sh", log)
+
+				//Docker
+				_ = g.Command("sed -i 's/DOCKER_VERSION/"+containerRuntimeVersion+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
+				_ = g.Command("sed -i 's/DOCKER_REGISTRIES/"+dockerRegistries+"/g' k8s-installer/k8s-script/osinit/installdocker.sh", log)
+
+				//addNode
+				_ = g.Command("sed -i 's/MASTER_IP/"+masterIP+"/g' k8s-installer/addNode/addnode.sh", log)
+
+				//权限
+				_ = g.Command("chmod -R +x .", log)
+
+				//打包
+				_ = g.Command("tar -zcvf k8s-installer.tar.gz k8s-installer", log)
+
+				//开始
+				_ = g.Command("sh start.sh ", log)
+				_ = g.Command("sh ./k8s-installer/preSet/preSet.sh ", log)
+				_ = g.Command("sh ./k8s-installer/addNode/addnode.sh ", log)
+
+				setNodeEntries(g, r, clientset, i, log)
+
+				_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master-init", log)
+				_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-node", log)
+				//_ = g.Command("sh localScript/delete_ansible_host.sh "+"k8s-master:children", log)
+				//_ = g.Command("sh localScript/delete_ansible_host.sh "+"allnodes:children", log)
+				_ = g.Command("sh localScript/delete_ansible_host.sh "+"allnodes:children", log)
+				_ = g.Command("rm -rf k8s-installer.tar.gz", log)
+				_ = g.Command("rm -rf k8s-installer", log)
+
+				g.Pages.RemovePage("form")
+				g.App.SetFocus(r)
+			} else {
+				modal := tview.NewModal().
+					SetText(reason).
+					AddButtons([]string{"ok"})
+				modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+					if buttonLabel == "ok" {
+						g.Pages.SwitchToPage("form")
+					}
+				})
+			}
+		}).
+		AddButton("Cancel", func() {
+			g.Pages.RemovePage("form")
+			g.App.SetFocus(r)
+		})
+
+	g.Pages.AddAndSwitchToPage("form", g.Modal(form, 80, 16), true).ShowPage("Manage")
 }
