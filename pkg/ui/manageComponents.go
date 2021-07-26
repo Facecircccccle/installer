@@ -5,16 +5,17 @@ import (
 	"github.com/rivo/tview"
 	"installer/pkg/menu"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 // Manage implements cluster management operations.
-func Manage(g *Gui, clientset *kubernetes.Clientset) {
+func Manage(g *Gui, clientset *kubernetes.Clientset, config *rest.Config) {
 
 	manageInfo := newManageInfo()
 	manageMenu := newManageMenu()
 	manageNode := newNodeManageGrid(g, clientset, manageInfo, manageMenu)
 
-	manageNodeStatus := newNodeStatusManageGrid(g, clientset, manageInfo, manageMenu)
+	manageNodeStatus := newNodeStatusManageGrid(g, clientset, manageInfo, manageMenu, config)
 	managePV := newPVManageGrid(g, clientset, manageInfo, manageMenu)
 	manageSC := newSCManageGrid(g, clientset, manageInfo, manageMenu)
 	manageNamespace := newNamespaceManageGrid(g, clientset, manageInfo, manageMenu)
@@ -24,12 +25,15 @@ func Manage(g *Gui, clientset *kubernetes.Clientset) {
 		AddItem(manageMenu, 1, 0, 1, 1, 0, 0, true).
 		AddItem(manageNodeStatus, 1, 1, 1, 1, 0, 0, false)
 
-	var c = manageNode
+	var c = manageNodeStatus
 	manageMenu.SetSelectedFunc(func(row int, column int) {
 		switch row {
 		//Cluster cpu...
 		case 0:
-
+			gridSetupLog.RemoveItem(c)
+			c = manageNodeStatus
+			gridSetupLog.AddItem(manageNodeStatus, 1, 1, 1, 1, 0, 0, false)
+			g.App.SetFocus(manageMenu)
 		//Node
 		case 1:
 			gridSetupLog.RemoveItem(c)
@@ -66,11 +70,11 @@ func Manage(g *Gui, clientset *kubernetes.Clientset) {
 	_ = g.App.SetRoot(g.Pages, true).Run()
 }
 
-func newNodeStatusManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) *myGrid {
-	table := newNodeStatusManage(g, clientset, info, m)
+func newNodeStatusManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus, config *rest.Config) *myGrid {
+	table := newNodeStatusManage(g, clientset, info, m, config)
 
 	grid := &myGrid{
-		Grid: tview.NewGrid().SetBorders(false).SetRows(-1, -1).
+		Grid: tview.NewGrid().SetBorders(false).SetRows(-1).
 			AddItem(table, 0, 0, 1, 1, 0, 0, true),
 	}
 	grid.SetTitle("").SetTitleAlign(tview.AlignCenter)
@@ -78,16 +82,16 @@ func newNodeStatusManageGrid(g *Gui, clientset *kubernetes.Clientset, info *Info
 	return grid
 }
 
-func newNodeStatusManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus) *myTable {
+func newNodeStatusManage(g *Gui, clientset *kubernetes.Clientset, info *Infos, m *menu.Menus, config *rest.Config) *myTable {
 	table := &myTable{
-		Table: tview.NewTable().SetSelectable(true, false).SetFixed(1, 1),
+		Table: tview.NewTable().SetSelectable(false, false).SetFixed(1, 1),
 	}
 
-	info.SetText("node Manage part")
+	info.SetText("node status part")
 
-	table.SetTitle("Namespace List").SetTitleAlign(tview.AlignCenter)
+	table.SetTitle("Node Status List").SetTitleAlign(tview.AlignCenter)
 	table.SetBorder(true)
-	setNodeStatusEntries(g, table, clientset, info)
+	setNodeStatusEntries(g, table, clientset, info, config)
 	setNodeStatusKeybinding(g, table, clientset, m, info)
 
 	return table

@@ -8,6 +8,7 @@ import (
 	"installer/pkg/constants"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"path/filepath"
@@ -90,9 +91,9 @@ func (g *Gui) importClusterForm(l *tview.List) {
 		//	AddInputField("Config addr", "", inputWidth, nil, nil).
 		AddButton("Load", func() {
 			if form.GetFormItemByLabel("config file is already in ~/.kube/config").(*tview.Checkbox).IsChecked() {
-				result, reason, clientset := configCheck()
+				result, reason, clientset, config := configCheck()
 				if result {
-					Manage(g, clientset)
+					Manage(g, clientset, config)
 
 					g.Pages.RemovePage("newClusterForm")
 					g.App.SetFocus(l)
@@ -134,7 +135,7 @@ func (g *Gui) importClusterForm(l *tview.List) {
 
 var Kubeconfig *string
 
-func configCheck() (bool, string, *kubernetes.Clientset) {
+func configCheck() (bool, string, *kubernetes.Clientset, *rest.Config) {
 	var kubeconfig *string
 	var clientset *kubernetes.Clientset
 
@@ -150,18 +151,18 @@ func configCheck() (bool, string, *kubernetes.Clientset) {
 
 	config, err := clientcmd.BuildConfigFromFlags("", *Kubeconfig)
 	if err != nil {
-		return false, "build config error, check input file path", nil
+		return false, "build config error, check input file path", nil, nil
 	}
 
 	clientset, err = kubernetes.NewForConfig(config)
 	if err != nil {
-		return false, "create clientset error, check input file available", nil
+		return false, "create clientset error, check input file available", nil, nil
 	}
 
 	_, err = clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return false, "can not connect to the cluster, please check the config file.", nil
+		return false, "can not connect to the cluster, please check the config file.", nil, nil
 	}
 
-	return true, "", clientset
+	return true, "", clientset, config
 }
